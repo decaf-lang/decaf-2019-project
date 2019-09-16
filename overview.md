@@ -134,7 +134,7 @@ PA3完成后，三地址码程序可在实验框架中给定的TAC模拟器上�
 由于 Scala 编译器会通过 `sbt` 自动下载，你无需安装 Scala 编译器。
 编译器前端采用 [Antlr](https://www.antlr.org) 构造。
 
-使用 IntelliJ IDEA：先安装 Scala [插件]https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html)，
+使用 IntelliJ IDEA：先安装 Scala [插件](https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html)，
 然后 [Import sbt project](https://www.jetbrains.com/help/idea/sbt-support.html)
 
 使用 Visual Studio Code：可安装 Metals [插件](https://scalameta.org/metals/)
