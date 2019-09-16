@@ -115,16 +115,16 @@ PA3完成后，三地址码程序可在实验框架中给定的TAC模拟器上�
 
 ### Java
 
-请先安装好 JDK 12 开发环境，正确设置好 JAVA_HOME 等环境变量。编译器前端采用 JFlex（https://jflex.de）
-和 Jacc（http://web.cecs.pdx.edu/~mpj/jacc/）构造。
+请先安装好 JDK 12 开发环境，正确设置好 JAVA_HOME 等环境变量。编译器前端采用 [JFlex](https://jflex.de)
+和 [Jacc](http://web.cecs.pdx.edu/~mpj/jacc/) 构造。
 
-使用 IntelliJ IDEA：Import Gradle project（可参考 https://www.jetbrains.com/help/idea/gradle.html）
+使用 IntelliJ IDEA：[Import Gradle project](https://www.jetbrains.com/help/idea/gradle.html)
 
-使用 Eclipse：安装 Gradle 插件（可参考 https://www.eclipse.org/community/eclipse_newsletter/2018/february/buildship.php，有可能需要修改 `gradle.build` 文件以开启插件）
+使用 Eclipse：安装 Gradle [插件](https://www.eclipse.org/community/eclipse_newsletter/2018/february/buildship.php)，有可能需要修改 `gradle.build` 文件以开启插件
 
-使用 Visual Studio Code：先配置 Java 插件（可参考 https://code.visualstudio.com/docs/languages/java），再安装 Gradle 插件（可参考 https://marketplace.visualstudio.com/items?itemName=cazzar09.Gradle）
+使用 Visual Studio Code：先配置 Java [插件](https://code.visualstudio.com/docs/languages/java)，再安装 Gradle [插件](https://marketplace.visualstudio.com/items?itemName=cazzar09.Gradle)
 
-除了使用 IDE 和编辑器插件构建外，还可以使用命令行构建 `./gradlew build` 和打包 `./gradlew jar`，更多命令请参见：https://gradle.org/guides/
+除了使用 IDE 和编辑器插件构建外，还可以使用命令行构建 `./gradlew build` 和打包 `./gradlew jar`，更多命令请参见 [Gradle](https://gradle.org/guides/)
 
 注意：在使用 `java -jar` 运行 `.jar` 文件时，请加上 `--enable-preview` 选项来打开 Java 12 switch 表达式支持。
 
@@ -132,15 +132,15 @@ PA3完成后，三地址码程序可在实验框架中给定的TAC模拟器上�
 
 请先安装好 JDK 8 或更高版本的开发环境，正确设置好 JAVA_HOME 等环境变量。
 由于 Scala 编译器会通过 `sbt` 自动下载，你无需安装 Scala 编译器。
-编译器前端采用 Antlr（https://www.antlr.org）构造。
+编译器前端采用 [Antlr](https://www.antlr.org) 构造。
 
-使用 IntelliJ IDEA：先安装 Scala 插件（可参考 https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html 完成插件安装），
-然后 Import sbt project（可参考 https://www.jetbrains.com/help/idea/sbt-support.html）
+使用 IntelliJ IDEA：先安装 Scala [插件]https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html)，
+然后 [Import sbt project](https://www.jetbrains.com/help/idea/sbt-support.html)
 
-使用 Visual Studio Code：可安装 Metals 插件（https://scalameta.org/metals/）
-和 sbt 插件（https://marketplace.visualstudio.com/items?itemName=lightbend.vscode-sbt-scala）
+使用 Visual Studio Code：可安装 Metals [插件](https://scalameta.org/metals/)
+和 sbt [插件](https://marketplace.visualstudio.com/items?itemName=lightbend.vscode-sbt-scala)
 
-除了使用 IDE 和编辑器插件构建外，还可以使用命令行构建 `sbt build` 和打包 `sbt assembly`，更多命令请参见：https://www.scala-sbt.org
+除了使用 IDE 和编辑器插件构建外，还可以使用命令行构建 `sbt build` 和打包 `sbt assembly`，更多命令请参见 [sbt](https://www.scala-sbt.org)
 
 ### Rust
 
@@ -162,8 +162,8 @@ PA3完成后，三地址码程序可在实验框架中给定的TAC模拟器上�
 
 需要特别注意的是，如果在自己的程序中借用了别人的成果或者思路，请在报告中**明确**说明，并指出参考的内容，如与谁讨论了什么，或者列出参考文献和网址等。
 
-完成上述步骤后，运行submit.py，它会首先检查你是否按照规定的格式命名了实验报告，以及正确构建了项目。
-之后，它会将源码、可执行文件及实验报告一起打包为submit.zip文件，将这个zip文件上传到网络学堂（待定？）。
+完成上述步骤后，运行 `submit.py`，它会首先检查你是否按照规定的格式命名了实验报告，以及正确构建了项目。
+之后，它会将源码、可执行文件及实验报告一起打包为 `.zip` 文件，将它上传到网络学堂（待定？）。
 由于课堂人数较多，为了便于测试和评分，请一定按此方法操作，不要自行打包。
 
 请在规定的截止时间前提交，晚交将会酌情扣分，不交将没有成绩。
