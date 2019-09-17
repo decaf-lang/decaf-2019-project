@@ -160,12 +160,14 @@ var o = new B(); // o : class B
 
 允许用户在程序中标注函数类型：
 
+```
 type ::= 'int' | 'bool' | 'string' | 'void' | 'class' id | type '[' ']'
        | '(' type ')' | argType '=>' type
 
 argType ::= '(' typeList? ')' | type
 
 typeList ::= type (',' type)*
+```
 
 这里新增操作符 '=>'。规定：'=>' 右结合，且优先级最低。
 元组类型只允许出现在函数类型的参数位置，不支持单独的元组类型如 `()`，`(int, string)`。
