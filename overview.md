@@ -95,9 +95,16 @@ PA3完成后，三地址码程序可在实验框架中给定的TAC模拟器上�
 这一阶段的实验框架仅实现了一种暴力寄存器分配算法，要求同学们能够实现更加高效的寄存器分配算法，并生成正确的汇编代码。除了 MIPS 外，根据框架开发和测试进度还可能
 提供 RISC-V 作为备选。对 RISC-V 或者其他未列出的平台感兴趣的同学可与助教联系。
 
+## 语言特性
+
+Decaf 项目实验框架是针对 Decaf 语言的实现。主体实验的要求是对 Decaf 语言增加新的语言特性。
+
+* Decaf 语言特性文档（将持续更新）：https://decaf-lang.gitbook.io/workspace/spec
+* 本学期必做实验所要求的新增特性文档（实验开始前会进一步细化和修订）：https://decaf-project.gitbook.io/decaf-2019/new-features
+
 ## 实验任务
 
-核心任务：根据当学期实验文档，实现原来Decaf语言所不具备的新语言特性，或者原框架所不具备的功能（代码优化、高效的寄存器分配算法等）。
+核心任务：根据当前学期实验文档，实现原来Decaf语言所不具备的新语言特性，或者原框架所不具备的功能（代码优化、高效的寄存器分配算法等）。
 在 Decaf 编译器框架的基础上，我们还会提供：
 
 1. 用于建立编程环境的工具、文档等
@@ -110,7 +117,6 @@ PA3完成后，三地址码程序可在实验框架中给定的TAC模拟器上�
 
 各阶段实验是在给定架构下进行扩展和改造，框架代码含 Java/Scala/Rust 三个开发版本。
 每位同学可任选三个版本**之一**，本学期只允许选定**一个**版本，我们会以**第一次实验**你所提交版本来确定你的选择。
-有关各版本实验框架的下载，本学期必做实验（PA1-A, PA1-B, PA2, PA3）所要求的新增特性相关文档，以及实验作业的提交要求等请等候通知。
 下面简要叙述三个版本的基本实验环境。
 
 ### Java
@@ -118,41 +124,52 @@ PA3完成后，三地址码程序可在实验框架中给定的TAC模拟器上�
 请先安装好 JDK 12 开发环境，正确设置好 JAVA_HOME 等环境变量。编译器前端采用 [JFlex](https://jflex.de)
 和 [Jacc](http://web.cecs.pdx.edu/~mpj/jacc/) 构造。
 
-使用 IntelliJ IDEA：[Import Gradle project](https://www.jetbrains.com/help/idea/gradle.html)
+使用 IntelliJ IDEA：[Import Gradle project](https://www.jetbrains.com/help/idea/gradle.html)。
 
-使用 Eclipse：安装 Gradle [插件](https://www.eclipse.org/community/eclipse_newsletter/2018/february/buildship.php)，有可能需要修改 `gradle.build` 文件以开启插件
+使用 Eclipse：安装 Gradle [插件](https://www.eclipse.org/community/eclipse_newsletter/2018/february/buildship.php)，有可能需要修改 `gradle.build` 文件以开启插件。
 
-使用 Visual Studio Code：先配置 Java [插件](https://code.visualstudio.com/docs/languages/java)，再安装 Gradle [插件](https://marketplace.visualstudio.com/items?itemName=cazzar09.Gradle)
+使用 Visual Studio Code：先配置 Java [插件](https://code.visualstudio.com/docs/languages/java)，再安装 Gradle [插件](https://marketplace.visualstudio.com/items?itemName=cazzar09.Gradle)。
 
-除了使用 IDE 和编辑器插件构建外，还可以使用命令行构建 `./gradlew build` 和打包 `./gradlew jar`，更多命令请参见 [Gradle](https://gradle.org/guides/)
+除了使用 IDE 和编辑器插件构建外，还可以使用命令行构建 `./gradlew build` 和打包 `./gradlew jar`，更多命令请参见 [Gradle](https://gradle.org/guides/) 的文档。
 
 注意：在使用 `java -jar` 运行 `.jar` 文件时，请加上 `--enable-preview` 选项来打开 Java 12 switch 表达式支持。
 
 ### Scala
 
 请先安装好 JDK 8 或更高版本的开发环境，正确设置好 JAVA_HOME 等环境变量。
-由于 Scala 编译器会通过 `sbt` 自动下载，你无需安装 Scala 编译器。
+由于 Scala 编译器会通过 [sbt](https://www.scala-sbt.org) 自动下载，你无需安装 Scala 编译器。
 编译器前端采用 [Antlr](https://www.antlr.org) 构造。
 
 使用 IntelliJ IDEA：先安装 Scala [插件](https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html)，
-然后 [Import sbt project](https://www.jetbrains.com/help/idea/sbt-support.html)
+然后 [Import sbt project](https://www.jetbrains.com/help/idea/sbt-support.html)。
 
-使用 Visual Studio Code：可安装 Metals [插件](https://scalameta.org/metals/)
-和 sbt [插件](https://marketplace.visualstudio.com/items?itemName=lightbend.vscode-sbt-scala)
+使用 Visual Studio Code：可安装 Metals language server [插件](https://scalameta.org/metals/)
+和 sbt [插件](https://marketplace.visualstudio.com/items?itemName=lightbend.vscode-sbt-scala)。
 
-除了使用 IDE 和编辑器插件构建外，还可以使用命令行构建 `sbt build` 和打包 `sbt assembly`，更多命令请参见 [sbt](https://www.scala-sbt.org)
+除了使用 IDE 和编辑器插件构建外，还可以使用命令行构建 `sbt build` 和打包 `sbt assembly`，更多命令请参见 [sbt](https://www.scala-sbt.org) 的文档。
 
 ### Rust
 
-要求 nightly 版本的 Rust 编译器，我们在`rustc 1.38.0-nightly`上测试过，比它更新的版本应该也可以。
+利用 [rustup](https://rustup.rs) 安装 nightly 版本的 Rust 编译器：`rustup default nightly`。
+项目已经在 `rustc 1.38.0-nightly` 上测试过，比它更新的版本应该也可以。
 
-推荐使用 CLion + Rust 插件作为开发环境，Visual Studio Code也可以，但是它似乎对复杂 toml 字符串支持的不太好，导致一些文件显示异常。
+使用 Clion：安装 Rust [插件](https://intellij-rust.github.io/docs/quick-start.html) 即可开发。
 
-执行`cargo run --bin test`可以直接测试实验结果，无需依赖于 Python 脚本。执行`cargo run --bin decaf`可以启动一个命令行程序。由于 Rust 编译出来的二进制文件不会像基于 jvm 的语言一样可以跨平台，所以提交时需要提交全部源代码，我们同样会用`cargo run --bin test`来测试实验结果。
+使用 Visual Studio Code：安装 Rust language server [插件](https://marketplace.visualstudio.com/items?itemName=DanielGriffen.Rust)。但是它似乎对复杂 toml 字符串支持的不太好，导致一些文件显示异常。
+
+* 运行：`cargo run --bin decaf`
+* 测试：`cargo run --bin test`
+
+### 预览版发布
+
+各版本实验框架的**预览版本**可前往 Github 查看：[Java](https://github.com/decaf-lang/decaf) [Scala](https://github.com/decaf-lang/decaf-in-scala) [Rust](https://github.com/decaf-lang/decaf-rs)
+注意：最终的实验框架将会在第一次实验前确定，此期间仍会更新。请注意在第一次实验发布时再次同步你的实验框架。
+
+关于本学期必做实验所要求的新增特性及实验作业要求等请等候通知。
 
 ## 测试方法
 
-各阶段开始前我们会通过网络学堂和Github等发布测试样例，通过运行样例目录中的 Python 脚本即可完成测试。
+各阶段开始前我们会通过网络学堂和 Github 等发布测试样例，通过运行样例目录中的 Python 脚本（Rust 版除外）即可完成测试。
 测试前请确保已正确完成项目构建，且生成的可执行文件能被脚本找到。关于测试脚本的详细使用方法会在发布时给出具体说明。
 
 所给出的测例原则上会覆盖所有新特性及要检查的点。
@@ -160,15 +177,27 @@ PA3完成后，三地址码程序可在实验框架中给定的TAC模拟器上�
 
 ## 提交方式
 
+本学期拟采用校内 Git [平台](https://git.tsinghua.edu.cn) 提交（至少是必做阶段的）实验代码。该平台直接用 info 账号登录。
+课程组近期将通过网络学堂的作业窗口收集大家的用户名，请前往 https://git.tsinghua.edu.cn 登录后查看并提交自己的用户名。
+实验开始前，助教将统一为大家创建私有仓库，请将实验代码在各阶段截止时间之前提交至此仓库。评分会以截止时间前的**最后一次 master 分支提交**为准。
+注意：所有阶段将共用一个仓库，以减轻大家的代码合并负担。还不会使用 Git 的同学，请自行查阅资料入门，掌握最基本的操作。
+
 完成实验的代码部分以后，还需写一份实验报告，说明你是怎么样完成该作业（例如加入了哪些新的数据结构、函数、工作逻辑等）以及作业过程中遇到的问题和解决方法等。
-为避免文档编码等问题，实验报告一律使用**PDF**格式，命名为 **`report.pdf`**，并放在源码**根目录**下，如`decaf_PA1/report.pdf`。
-实验报告应在满足各次实验具体要求的情况下，尽量简明扼要。各阶段报告的具体要求讲会在该阶段的实验文档中明确给出，请仔细阅读，未按照要求提交者酌情扣分。
+为避免文档编码等问题，实验报告一律使用**PDF**格式，命名为 **`report-PA_NAME.pdf`**，并放在源码**根目录**下，其中 `PA_NAME` 可能是：
+
+```
+PA1-A
+PA1-B
+PA2
+PA3
+PA3-JVM
+```
+
+如 `YOUR_REPO/report-PA1-A.pdf` 是第一次实验报告的文件名。
+
+实验报告应在满足各次实验具体要求的情况下，尽量简明扼要。各阶段报告的具体要求会在该阶段的实验文档中明确给出，请仔细阅读，未按照要求提交者酌情扣分。
 
 需要特别注意的是，如果在自己的程序中借用了别人的成果或者思路，请在报告中**明确**说明，并指出参考的内容，如与谁讨论了什么，或者列出参考文献和网址等。
-
-完成上述步骤后，运行 `submit.py`，它会首先检查你是否按照规定的格式命名了实验报告，以及正确构建了项目。
-之后，它会将源码、可执行文件及实验报告一起打包为 `.zip` 文件，将它上传到网络学堂（待定？）。
-由于课堂人数较多，为了便于测试和评分，请一定按此方法操作，不要自行打包。
 
 请在规定的截止时间前提交，晚交将会酌情扣分，不交将没有成绩。
 
