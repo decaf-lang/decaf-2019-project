@@ -144,7 +144,11 @@ PA3完成后，三地址码程序可在实验框架中给定的TAC模拟器上�
 
 ### Rust
 
-<!-- TODO: @MashPlant -->
+要求 nightly 版本的 Rust 编译器，我们在`rustc 1.38.0-nightly`上测试过，比它更新的版本应该也可以。
+
+推荐使用 CLion + Rust 插件作为开发环境，Visual Studio Code也可以，但是它似乎对复杂 toml 字符串支持的不太好，导致一些文件显示异常。
+
+执行`cargo run --bin test`可以直接测试实验结果，无需依赖于 Python 脚本。执行`cargo run --bin decaf`可以启动一个命令行程序。由于 Rust 编译出来的二进制文件不会像基于 jvm 的语言一样可以跨平台，所以提交时需要提交全部源代码，我们同样会用`cargo run --bin test`来测试实验结果。
 
 ## 测试方法
 
