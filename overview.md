@@ -165,7 +165,7 @@ Decaf 项目实验框架是针对 Decaf 语言的实现。主体实验的要求�
 各版本实验框架的**预览版本**可前往 Github 查看：[Java](https://github.com/decaf-lang/decaf) [Scala](https://github.com/decaf-lang/decaf-in-scala) [Rust](https://github.com/decaf-lang/decaf-rs)
 注意：最终的实验框架将会在第一次实验前确定，此期间仍会更新。请注意在第一次实验发布时再次同步你的实验框架。
 
-关于本学期必做实验所要求的新增特性及实验作业要求等请等候通知。
+本学期必做实验的具体要求将在各阶段实验开始时发布。
 
 ## 测试方法
 
