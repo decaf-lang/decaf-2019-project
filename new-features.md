@@ -179,9 +179,9 @@ var o = new B(); // o : class B
 
 ```
 type ::= 原来的
-       | type '(' typeList? ')'
+       | type '(' typeList ')'
 
-typeList ::= type (',' type)*
+typeList ::= type (',' type)* | ε
 ```
 
 这里我们采用类似于 C 语言函数指针和 JVM 类型描述符的语法来标注函数类型，如 `int(class A, string)` 表示该函数返回值类型是 `int`，它接受两个参数，类型分别是 `class A` 和 `string`。
