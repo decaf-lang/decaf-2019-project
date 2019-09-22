@@ -109,18 +109,20 @@ class Bar extends Foo {
 对应的虚表为
 
 ```
-VTABLE(_V_Foo) { // _V_ 是虚表标签的前缀
-    // empty
+VTABLE<Foo> {
+    NULL
     "Foo"
 }
 
-VTABLE(_V_Bar) {
-    _V_Foo
+VTABLE<Bar> {
+    NULL
     "Bar"
-    _L_Bar_foo; // _L_ 是函数入口标签的前缀
-    _L_Bar_bar;
+    FUNC<Bar.foo>
+    FUNC<Bar.bar>
 }
 ```
+
+但是你需要自己保证在一个继承链上，同样的方法名在虚表中的偏移量一致。
 
 抽象类的静态方法与普通静态方法无区别，为它们各自生成一段函数即可。
 
@@ -151,7 +153,7 @@ var s = "123";
 此外，在实现了特性三的基础上，用 'var' 关键字可以方便的定义 Lambda 表达式，如：
 
 ```
-var const = (int x) => (int y) => x; // 类型特化的 K 组合子
+var const = fun (int x) => fun (int y) => x; // 类型特化的 K 组合子
 ```
 
 本地类型推导要求推断出表达式最精确的类型，如：
@@ -176,19 +178,13 @@ var o = new B(); // o : class B
 允许用户在程序中标注函数类型：
 
 ```
-type ::= 'int' | 'bool' | 'string' | 'void' | 'class' id | type '[' ']'
-       | '(' type ')' | argType '=>' type
-
-argType ::= '(' typeList? ')' | type
+type ::= 原来的
+       | type '(' typeList? ')'
 
 typeList ::= type (',' type)*
 ```
 
-这里新增操作符 '=>'。规定：'=>' 右结合，且优先级最低。
-元组类型只允许出现在函数类型的参数位置，不支持单独的元组类型如 `()`，`(int, string)`。
-一元组就是普通的类型，即 `(int[])` 就是 `int[]`。
-
-例：`int => int[]` 是 `int => (int[])` 而不是 `(int => int)[]`。
+这里我们采用类似于 C 语言函数指针和 JVM 类型描述符的语法来标注函数类型，如 `int(class A, string)` 表示该函数返回值类型是 `int`，它接受两个参数，类型分别是 `class A` 和 `string`。
 
 #### 与实际类型的对应
 
@@ -201,9 +197,7 @@ typeList ::= type (',' type)*
 'void'                  --> VoidType
 'class' className       --> ClassType(className)
 elemType '[' ']'        --> ArrayType(elemType)
-'(' type ')'            --> type
-'(' ')' '=>' type       --> FunType([], type)
-'(' t1 ',' t2 ',' ... ')' '=>' type     --> FunType([t1, t2, ...], type)
+type '(' t1 ',' t2 ',' ... ')'  --> FunType([t1, t2, ...], type)
 ```
 
 特别地，VoidType 只能作为函数的返回类型（包括lambda)，不能作为任何变量的类型或者函数参数的类型。
@@ -225,16 +219,18 @@ elemType '[' ']'        --> ArrayType(elemType)
 
 ```
 expr ::= 原来的
-       | '(' varList ')' '=>' (expr | stmtBlock)
+       | 'fun' '(' varList ')' ('=>' expr | stmtBlock)
 
 call ::= expr '(' exprList ')'
 ```
 
-注意这里我们要求 Lambda 表达式的每个参数必须标明类型，但是返回的表达式不标注类型。与类型中的 '=>' 相同，它具有右结合性和最低优先级。
+新增关键字 'fun' 和操作符 '=>'。操作符 '=>' 具有最低优先级。
+
+注意这里我们要求 Lambda 表达式的每个参数必须标明类型，但是返回的表达式不标注类型。
 
 #### 类型推导与检查
 
-对于 `(t1 x1, t2 x2, ...) => y`，若推导出 `y` 的类型为 `t`，那么整个 Lambda 表达式的类型为 `FunType([t1, t2, ...], t)`。
+对于 `fun (t1 x1, t2 x2, ...) => y`，若推导出 `y` 的类型为 `t`，那么整个 Lambda 表达式的类型为 `FunType([t1, t2, ...], t)`。
 
 若 `y` 是一个 `BlockStmt`，则 `y` 的类型要么是 VoidType（当 BlockStmt 的所有执行路径不返回值时），要么是 BlockStmt 的所有执行路径返回值的最小“上界”。定义：称 t 是类型 t1, t2, ..., tn 的上界，若 t1 <: t, t2 <: t , ..., tn <: t。若该上界不存在，应该报错：Incompatible return types in blocked expression
 
@@ -242,7 +238,7 @@ call ::= expr '(' exprList ')'
 
 #### 捕获变量与闭包生成（参考实现）
 
-针对每种类型的 Lambda 表达式，为了支持它像对象一样可以到处传递，我们可以把它真的实例化为一个对象，并规定 apply 方法为 Lambda 表达式调用时执行的函数。例如，任何 int => int 类型的 Lambda 表达式都应该是如下类的某个子类的实例：
+针对每种类型的 Lambda 表达式，为了支持它像对象一样可以到处传递，我们可以把它真的实例化为一个对象，并规定 apply 方法为 Lambda 表达式调用时执行的函数。例如，任何 `int(int)` 类型的 Lambda 表达式都应该是如下类的某个子类的实例：
 
 ```
 abstract class Lambda$int$int {
@@ -260,7 +256,7 @@ class Foo {
     void foo() {
         var x = 5;          // x : int
         var a = new A();    // a : class A
-        var func = (int y) => {
+        var func = fun (int y) {
             a.doSomething();
             this.anotherMethod();
             return x + y;
@@ -303,7 +299,7 @@ class Foo {
     void foo() {
         var x = 5;          // x : int
         var a = new A();    // a : class A
-        var func = (int y) => {
+        var func = fun (int y) {
             a = null;
             return x + y;
         }
@@ -353,7 +349,7 @@ class Foo {
 
 ```
 class IntList {
-    void foreach(int => void action) { ... }
+    void foreach(void(int) action) { ... }
 
     void print(int x) { ... }
 
@@ -363,11 +359,11 @@ class IntList {
 }
 ```
 
-由于 `print` 的类型就是 `int => void`，可以直接传给 `foreach` 作为参数。生成代码时，直接将 `foreach` 封装为相应的闭包对象即可：
+由于 `print` 的类型就是 `void(int)`，可以直接传给 `foreach` 作为参数。生成代码时，直接将 `foreach` 封装为相应的闭包对象即可：
 
 ```
 class IntList {
-    void foreach(int => void action) { ... }
+    void foreach(void(int) action) { ... }
 
     void print(int x) { ... }
 
