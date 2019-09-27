@@ -112,6 +112,74 @@ let odd x = x `mod` 2 /= 0 in    map (*3) $ filter odd a
 在我们的代码框架中我们已经为你定义好各种符号在 AST 中对应的数据结构。请在动
 手实现之前大致了解一下 `Tree.java` 中所包含的各个类。
 
+### 拓展上下文无关文法
+Jacc 接受的是上下文无关文法，但我们交流时，上下文无关文法可能稍显罗嗦。
+
+比如如下定义（关于 abstract 参见后文）
+
+```yacc
+TopLevel        :   ClassList
+                ;
+
+ClassList       :   ClassList ClassDef
+                |   ClassDef
+                ;
+
+ClassDef        :   CLASS Id ExtendsClause '{' FieldList '}'
+                |   ABSTRACT CLASS Id ExtendsClause '{' FieldList '}'
+                ;
+
+ExtendsClause   :   EXTENDS Id
+                |   /* empty */
+                ;
+
+FieldList       :   FieldList Var ';'
+                |   FieldList MethodDef
+                |   /* empty */
+                ;
+```
+
+表示的是
+
+> 一个 TopLevel 有至少一个 ClassDef。
+>
+> 一个 ClassDef 是 （可有可无的）abstract，之后 class Id，然后（可有可无的）extends Id，最后是大括号包起来的零或多个字段。
+>
+> 一个字段可以是成员变量或者成员函数。
+
+我们可以写成如下形式，更精确和简明地反映上述含义
+
+```
+TopLevel        :   ClassDef +
+                ;
+
+ClassDef        :   'abstract'? 'class' Id ('extends' Id)? '{' FieldDef* '}'
+                ;
+
+FieldDef        :   Var ';'
+                |   MethodDef
+                ;
+```
+
+相当于我们允许产生式右边有一些拓展，如 `*`，`+` 等。具体的，我们允许
+* `+`：在它前面的符号出现一次或者多次
+* `+`：在它前面的符号出现零次或者多次
+* `?`：在它前面的符号出现零次或者一次
+* `'XXX'`：引号内原文出现
+* `(` `)`：分组。比如 `(Type Id ',')* Type Id` 就是参数列表的一种描述
+
+这些拓展可以直接对应到上下文无关文法，就像上面的例子中 `ClassList` 对应 `ClassDef+` 一样。
+事实上，上下文无关文法对应 BNF（Backus–Naur Form），而加上拓展后就变成了 EBNF（Extended Backus–Naur Form）。
+
+加入这些拓展可以有效简化语法。作为一个例子，Scala 版本使用的 ANTLR 4 就支持这些拓展。
+现在 [ANTLR 4 版本的文法文件](https://github.com/decaf-lang/decaf-in-scala/blob/master/src/main/antlr4/DecafParser.g4)的语法部分只有 80 行，
+而 Jacc 版本的语法部分有 126 行，多了 50% 以上。
+（测量去除了文件头、语法动作、注释、空行，Scala 文法文件被改写成和 Java 版本一样的风格，2019 年 9 月 27 日测量）。
+原始文件的话，Jacc 更不敌 ANTLR 4：Jacc 的 522 行是 ANTLR 128 行的好几倍。
+
+所以，后面我们会使用这种拓展的上下文无关文法。
+另外的好处是，这样能够防止你们直接抄实验指导书。
+
 ## 实验内容
 本次实验给出了基础的 Decaf 框架，它完成了[《Decaf语言规范》](https://decaf-lang.gitbook.io/workspace/spec)。
 本次实验你的任务是，在这个框架的基础上，完成新特性的词法语法分析。
