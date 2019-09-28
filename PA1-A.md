@@ -112,8 +112,8 @@ let odd x = x `mod` 2 /= 0 in    map (*3) $ filter odd a
 在我们的代码框架中我们已经为你定义好各种符号在 AST 中对应的数据结构。请在动
 手实现之前大致了解一下 `Tree.java` 中所包含的各个类。
 
-### 拓展上下文无关文法
-Jacc 接受的是上下文无关文法，但我们交流时，上下文无关文法可能稍显罗嗦。
+### 拓展 CFG
+Jacc 接受的是上下文无关文法（CFG），但我们交流时，CFG 可能稍显罗嗦。
 
 比如如下定义（关于 abstract 参见后文）
 
@@ -150,14 +150,14 @@ FieldList       :   FieldList Var ';'
 我们可以写成如下形式，更精确和简明地反映上述含义
 
 ```
-TopLevel        :   ClassDef +
+topLevel        :   classDef +
                 ;
 
-ClassDef        :   'abstract'? 'class' Id ('extends' Id)? '{' FieldDef* '}'
+classDef        :   'abstract'? 'class' Id ('extends' Id)? '{' fieldDef* '}'
                 ;
 
-FieldDef        :   Var ';'
-                |   MethodDef
+fieldDef        :   varDef ';'
+                |   methodDef
                 ;
 ```
 
@@ -166,24 +166,28 @@ FieldDef        :   Var ';'
 * `*`：在它前面的符号出现零次或者多次
 * `?`：在它前面的符号出现零次或者一次
 * `'XXX'`：引号内原文出现
-* `(` `)`：分组。比如 `(Type Id ',')* Type Id` 就是参数列表（如`int a, int b, string c`）的一种描述
-* `|`：选择，原来也有，但是现在选择能出现在分组里了。参见后文例子。
+* `(` `)`：分组。比如 `(Type Id ',')* Type Id` 就是非空参数列表（如`int a, int b, string c`）的一种描述
+* `|`：选择，原来也有，但是现在选择能出现在分组里了。例如 `s ::= ('a' | 'b') 'c'` 表示 `ac` 或者 `bc`。
 
-这些拓展可以直接对应到上下文无关文法，就像上面的例子中 `ClassList` 对应 `ClassDef+` 一样。
-事实上，上下文无关文法对应 BNF（Backus–Naur Form），而加上拓展后就变成了 EBNF（Extended Backus–Naur Form）。
+这些拓展可以直接对应到 CFG，就像上面的例子中 `ClassList` 对应 `ClassDef+` 一样；
+但实际上“拓展”之后我们得到的文法表达能力不会比 CFG 更强，所谓“拓展”只是 CFG 的语法糖。
+事实上，最朴素的 CFG 对应 BNF（Backus–Naur Form），
+而加上这些拓展后就变成了 EBNF（Extended Backus–Naur Form）。
 
 加入这些拓展可以有效简化语法。作为一个例子，Scala 版本使用的 ANTLR 4 就支持这些拓展。
 现在 [ANTLR 4 版本的文法文件](https://github.com/decaf-lang/decaf-in-scala/blob/master/src/main/antlr4/DecafParser.g4)的语法部分只有 80 行，
 而 Jacc 版本的语法部分有 126 行，多了 50% 以上。
-（测量去除了文件头、语法动作、注释、空行，Scala 文法文件被改写成和 Java 版本一样的风格，2019 年 9 月 27 日测量）。
 原始文件的话，Jacc 更不敌 ANTLR 4：Jacc 的 522 行是 ANTLR 128 行的好几倍。
+> 备注：语法测量去除了文件头、语法动作、注释、空行，Scala 文法文件被改写成和 Java 版本一样的风格，2019 年 9 月 27 日测量。
 
-所以，后面我们会使用这种拓展的上下文无关文法。
+所以，后面我们会使用这种拓展的 CFG。
 另外的好处是，这样能够防止你们直接抄实验指导书。
 
 ## 实验内容
 本次实验给出了基础的 Decaf 框架，它完成了[《Decaf语言规范》](https://decaf-lang.gitbook.io/workspace/spec)。
 本次实验你的任务是，在这个框架的基础上，完成新特性的词法语法分析。
+
+我们给出的语法改动只是参考，你可以自由发挥，只要能通过测例。
 
 ### 新特性 1：抽象类。
 加入 `abstract` 关键字，用来修饰类和成员函数。例如，
@@ -203,7 +207,8 @@ methodDef ::= 'static'? type Id '(' paramList ')' block
 ```
 classDef ::= 'abstract'? 'class' Id  ('extends' Id)?  '{' field* '}'
 
-methodDef ::= ('static' | 'abstract')? type Id '(' paramList ')' block
+methodDef ::= 'static'? type Id '(' paramList ')' block
+            | 'abstract' type Id '(' paramList ')' ';'
 ```
 
 ### 新特性 2：局部类型推断
@@ -217,48 +222,62 @@ class Main {
 }
 ```
 
-参考语法改动：略。
+参考语法：
+
+```
+simpleStmt ::= ...
+             | 'var' id '=' expr
+```
 
 ### 新特性 3：Lambda 表达式
 Lambda 表达式很复杂。幸运的是 PA1-A 中你只需考虑词法和语法分析的问题。
 
 具体地，你需要支持
 
-* **类型可能出现在括号中了**，即
+* **函数类型**：语法如
+
+参考语法：
 
 ```
 type ::= ...
-       | '(' type ')'
-```
+       | type '(' typeList ')'
 
-* **lambda 类型（即函数类型）**：语法如
-
-```
-type ::= ...
-       | type '(' type* ')'
+typeList ::= (type (',' type)*)?
 ```
 
 括号左边的是返回值的类型，括号内的是诸参数的类型。
 
 
-* **lambda 表达式**：有两种, block lambda 和 expression lambda。
+* **lambda 表达式**：有两种, block lambda 和 expression lambda。lambda 表达式的类型是函数类型。
+
+参考语法：
 
 ```
 type ::= ...
-       | 'fun' '(' ( type id )* ')' '=>' expr
-       | 'fun' '(' ( type id )* ')' block
+       | 'fun' '(' paramList ')' '=>' expr
+       | 'fun' '(' paramList ')' block
+
+paramList ::= (type Id (',' type Id)*)?
 ```
 
 其中箭头 `'=>'` 左边的是参数列表，右边是返回值。
 Block lambda 可以包含 return 语句表示返回值（当然，没有 return 语句的话返回类型 void）。
 
 * **函数调用**：原来只能调用任何成员函数，现在可以调用任意表达式了。
-  语法改动略。
+
+参考语法改动：从
+```
+call ::= (expr '.')? Id '(' exprList ')'
+```
+变为
+```
+call ::= expr '(' exprList ')'
+```
 
 ### lambda 表达式的例子
 对部分同学，lambda 表达式还是个新东西。所以下面是一些例子，帮助你理解。
 
-* lambda 类型
+* 函数类型
 
 ```
 void()               // 没有参数，返回类型 void
@@ -271,7 +290,7 @@ class Main(int, int) // 接受两个 int 类型的参数，返回 Main 的一个
 
 int(int(int))        // 参数是一个 int 到 int 的函数，返回值是 int
 
-(int(int))(int)      // 参数是一个 int，返回一个 int 到 int 的函数（返回值还可以继续接受参数）
+int(int)(int)        // 参数是一个 int，返回一个 int 到 int 的函数（返回值还可以继续接受参数）
 ```
 
 * lambda 表达式
@@ -298,14 +317,25 @@ int(int(int))        // 参数是一个 int 到 int 的函数，返回值是 int
 * 函数调用
 
 ```
-(int(int))(int) f = (int x) => (int y) => x + y;
+int(int)(int) f = (int x) => (int y) => x + y;
 Print(f(2)(3));                                     // 输出 5。这里有两次函数调用（不含 Print）！
 ```
+
+> 一个小故事：
+>
+> 我们采用 C / C++ 风格来写函数类型。你可能觉得这种写法很怪。
+> 还有更怪的：C 中声明一个函数指针 `a` 要写成 `int (*a)(int, int);`
+> 但是，你可以认为这样的类型写法指明的是 “我们应该如何使用这个类型的变量”
+> 比如上面的 `a`，它的用法是 `int b = (*a)(4, 5)` -- 和签名太像了。
+> 也许这也能帮助你理解，为什么 C 和 C++ 数组声明是 `int a[10]` 而不是 `int[10] a`，
+> 以及为什么有些人写 `char *a` 而不是 `char* a`。
 
 ## 实验评分和实验报告
 实验评分分两部分
 * 评测结果：80%。这部分是机器检查，要求你的输出和标准输出**一模一样**。我们会有未公开的测例。
-* 实验报告（根目录下 `report-PA1-A.pdf` 文件）：20%。用中文简要叙述你的工作内容。并且**回答以下问题**
+* 实验报告（根目录下 `report-PA1-A.pdf` 文件）：20%。用中文简要叙述你的工作内容。
+
+要求实验报告中回答以下问题：
 
 1. 我们用 `Tree` 里面的嵌套类表示抽象语法树的结点。但这些嵌套类间还有继承关系。
   如果 A 继承了 B，那么语法上会不会 A 和 B 有什么关系？限用 100 字符内一句话说明。
