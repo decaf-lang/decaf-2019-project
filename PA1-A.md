@@ -227,7 +227,7 @@ typeList ::= (type (',' type)*)?
 语法规范：
 
 ```text
-type ::= ...
+expr ::= ...
        | 'fun' '(' paramList ')' '=>' expr
        | 'fun' '(' paramList ')' block
 
@@ -283,7 +283,7 @@ fun (int x, int y) => x + y     // 类型是 int(int, int)
 
 fun (int x) => { if (x == 0) return "no"; return "yes"; }   // 类型是 string(int)
 
-fun (int x) => (int y) => x + y
+fun (int x) => fun (int y) => x + y
 // 类型是 (int(int))(int)
 // 上面一个函数是所谓 curry function 的例子。其实它就是 x+y，但是它不要求你把两个参数一次性都提供了。
 // 而是先接受第一个参数 x，然后返回一个函数。被返回的函数还能接受参数 y。
