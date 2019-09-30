@@ -1,50 +1,44 @@
 # PA1-A: 词法分析、语法分析和抽象语法树生成
 
 ## 任务概述
+
 在本阶段中，大家的任务是编码实现 Decaf 语言编译器的词法分析和语法分析部分，同时生成抽象语法树。
 
 ![](assets/pa1a-1.png)
 
-首先是**词法分析**（lexical analysis）。
-你需要运用“词法分析程序自动生成工具”（lexer generator）jflex 生成 Decaf 语言的“词法分析程序”（lexer，亦称 scanner）。
+首先是**词法分析** (lexical analysis)。
+你需要运用“词法分析程序自动构造工具” (lexer generator) 生成 Decaf 语言的“词法分析程序” (lexer/scanner)。
 词法分析程序是前端分析的第一部分，它的功能是从左至右扫描 Decaf 源语言程序，
-识别出标识符、保留字、整数常量、操作符等各种单词符号，并把识别结果以终结符的形式返回给语法分析程序。
-这一部分的实验目的是要掌握 jflex 工具的用法，体会正规表达式、有限自动机等理论的应用，并对词法分析程序的工作机制有比较深入的了解。
+识别出标识符、关键字、整数常量、操作符等各种单词符号，并把识别结果以单词 (token) 的形式返回给语法分析程序。
+这一部分的实验目的是要掌握自动工具的用法，体会正规表达式、有限自动机等理论的应用，并对词法分析程序的工作机制有比较深入的理解。
 
-之后是**语法分析**（parsing）。
-除了词法分析程序以外，大家还需要运用“语法分析程序自动生成工具”（parser generator）jacc 生成
-Decaf 语言的语法分析程序（parser）。
-在 PA1-A 中， Decaf 语法分析程序的功能是对词法分析输出的终结符串（注意不是字符串）进行自底向上的分析。
-这一部分的实验目的是要初步掌握 jacc 工具的用法，体会上下文无关文法、LALR(1) 分析等理论的应用。
+之后是**语法分析** (parsing)。
+你需要运用“语法分析程序自动构造工具” (parser generator) 生成 Decaf 语言的“语法分析程序” (parser)，并最终生成抽象语法树。
+这一部分的实验目的是要掌握自动工具工具的用法，体会上下文无关文法、LALR(1) 或 LL(*) 分析等理论在编译器构造中的实际应用。
 
-PA1-A 的两部分是密切相关的：语法分析程序并不直接对 Decaf 源程序进行处理，而是调用词法分析程序对 Decaf 源程序进行词法分析，然后对词法分析程序返回的终结符序列进行归约，也就是说，词法分析程序输出的结果才是语法分析的输入。
+PA1-A 的两部分是密切相关的：语法分析程序并不直接对 Decaf 源程序进行处理，而是调用词法分析程序对 Decaf 源程序进行词法分析，
+然后对词法分析程序返回的终结符序列进行归约，也就是说，词法分析程序输出的结果才是语法分析的输入。
 
 当语法分析程序运行结束，如果没有发现语法错误，PA1-A 会生成与 Decaf 源程序对应的抽象语法树。这就是 PA1-A 的最终产物。
 
-PA1-A 是整个实验的热身阶段，需要自己完成的代码量较少，主要的工作在于建立编程环境、熟悉代码框架、熟悉 Decaf 语言以及掌握 jflex 和 jacc 的具体用法等。
+PA1-A 是整个实验的热身阶段，需要自己完成的代码量较少，主要的工作在于建立编程环境、熟悉代码框架、熟悉 Decaf 语言以及掌握自动工具的具体用法等。
+不熟悉 Git 的同学，请在这一阶段逐渐掌握 Git 的基本使用，包括 clone/pull/commit/push 等入门功能，
+以保证在截止日前前你能将代码提交到指定仓库的 master 分支上。
 
-本阶段的测试要求是输出结果跟标准输出完全一致。我们保留了一些测试例子没有公开，所以请自己编写一些测试例子，测试自己的编译器是符合 Decaf 语言规范里的相应规定。
-
-### 本阶段涉及的文件的说明
-本阶段主要涉及的文件有
-
-| 文件 | 含义 | 你的任务 |
-| --- | --- | --- |
-| `Lexer.l` | 词法分析的规则 | 定义什么正则表达式生成什么非终结符 |
-| `Parser.y` | 语法分析的规则 | 定义新特性的语法规则和归约动作 |
-| `SemValue.java` | 语法分析产生的非终结符都有一个相关的 SemValue 保存必要的信息 | 如果需要，增加新字段 |
-| `Tree.java` | 抽象语法树的结点 | 如果需要，增加对应新特性的新结点 |
+本阶段的测试方法是：编译器格式化输出抽象语法树，测试程序比较其与标准输出是否完全一致。
+我们保留了一些测试例子没有公开，所以请自己再编写一些测例，以更加充分地测试你的实现是否符合新特性的规范。
 
 ## 相关知识
-### lambda 表达式
-一等公民的函数（function as first-class citizens）（也称 lambda
-表达式）指的是，函数能像普通的 int， string 一样，
-通过字面量（literal）初始化、作为参数和返回值传递。
-现代语言，Rust，Haskell，Scala，甚至 C++ 和 Go 都开始支持一等公民的函数。
 
-例如 Java 语言中函数就不是一等公民，所以只能通过将函数包装成类的方法绕开这个限制。
-下面的 `IntPredicate` 虽说是个 interface，但其实说是整数到布尔值的函数类型更合适。
-但是 Java 不支持一等公民的函数，所以只好用 interface 和局部类来实现。
+### First-class Functions
+
+函数式 (functional) 语言的一个显著特征是，函数是“一等公民” (first-class citizens)，即函数能像普通的值（如整数、字符串、对象等）一样，
+作为函数调用的参数和返回值进行传递。
+Lambda 表达式提供了一种不用取名字就能直接定义出来一个函数的方法。它是所有函数式语言（如 Haskell/Ocaml/Scala）的标配。
+很多不以函数式作为典型语言特征的语言，如 C#、Rust、C++ 甚至 Java 都开始支持 lambda 表达式。
+
+老版本的 Java 不支持 lambda 表达式，为了实现整数到布尔值的函数类型，我们不得不通过接口来定义：
+
 ```java
 interface IntPredicate { boolean judge(int x); }
 
@@ -74,8 +68,11 @@ class Main {
 }
 ```
 
-lambda 表达式的用处主要便是简化编程，让你的程序更可读、更可维护、更健壮。
-比较下面的 C 代码
+虽然新版的 Java 支持了 lambda 表达式，但它本质上还是会对应到接口 `Function`/`Consumer`/`Supplier` 等。
+因此在实际使用中，Java 的函数式特性比普通函数式语言要不方便得多。
+
+Lambda 表达式能你的程序更可读、更可维护、更健壮。比较下面的 C 代码
+
 ```c
 int l = 0;
 for (int i = 0; i < n; i++) {
@@ -83,137 +80,113 @@ for (int i = 0; i < n; i++) {
     b[l++] = a[i] * 3;
 }
 ```
+
 和 Haskell 代码
+
 ```haskell
-let odd x = x `mod` 2 /= 0 in    map (*3) $ filter odd a
+let odd x = x `mod` 2 /= 0
+in  map (*3) $ filter odd a
 ```
+
 后者更可读，更精准的传达了程序员的意图：“先去掉偶数，然后乘三”。
 
 ### 抽象语法树
-所谓的抽象语法树（AST 即 Abstract Syntax Tree），是指一种只跟我们关心的内容有关的语法树表示形式。
+
+所谓**抽象语法树** (Abstract Syntax Tree, AST)，是指一种只跟我们关心的内容有关的语法树表示形式。
 抽象语法是相对于具体语法而言的，所谓具体语法是指针对字符串形式的语法规则，而且这样的语法规则没有二义性，适合于指导语法分析过程。
 抽象语法树是一种非常接近源代码的中间表示，它的特点是：
 
 1. 不含我们不关心的终结符，例如逗号等（实际上只含标识符、常量等终结符）。
-
-2. 不具体体现语法分析的细节步骤，例如对于 `List ::= List Elem | Elem` 这样的规
-则，按照语法分析的细节步骤来记录的话应该是一棵二叉树，但是在抽象语法树中我们
-只需要表示成一个链表，这样更便于后续处理。
-
+2. 不具体体现语法分析的细节步骤，例如对于 `List ::= List Elem | Elem` 这样的规则，
+按照语法分析的细节步骤来记录的话应该是一棵二叉树，但是在抽象语法树中我们
+只需要表示成一个列表，这样更便于后续处理。
 3. 可能在结构上含有二义性，例如加法表达式在抽象语法中可能是 `Expr -> Expr + Expr`，
-但是这种二义性对抽象语法树而言是无害的——因为我们已经有语法树了。
-
-4. 体现源程序的语法结构。
+但是这种二义性对抽象语法树而言是无害的——因为这种二义性已经在语法分析阶段解决了。
+4. 体现源程序的语法结构，尤其是树形结构。
 
 使用抽象语法树表示程序的最大好处是把语法分析结果保存下来，后面可以反复利用。
-在面向对象的语言中描述抽象语法树是非常简单的：我们只需要为每种非终结符创建一
-个类。
+在面向对象的语言中描述抽象语法树是非常简单的：我们只需要为每种非终结符创建一个类。
 
-在我们的代码框架中我们已经为你定义好各种符号在 AST 中对应的数据结构。请在动
-手实现之前大致了解一下 `Tree.java` 中所包含的各个类。
+在我们的代码框架中我们已经为你定义好各种符号在 AST 中对应的数据结构。请在实验开始前阅读相关代码。
 
-### 拓展 CFG
-Jacc 接受的是上下文无关文法（CFG），但我们交流时，CFG 可能稍显罗嗦。
+### EBNF
 
-比如如下定义（关于 abstract 参见后文）
+使用最朴素的 BNF (Backus–Naur Form)，Decaf 语言的一个文法片段描述如下：
 
-```yacc
-TopLevel        :   ClassList
-                ;
-
-ClassList       :   ClassList ClassDef
-                |   ClassDef
-                ;
-
-ClassDef        :   CLASS Id ExtendsClause '{' FieldList '}'
-                |   ABSTRACT CLASS Id ExtendsClause '{' FieldList '}'
-                ;
-
-ExtendsClause   :   EXTENDS Id
-                |   /* empty */
-                ;
-
-FieldList       :   FieldList Var ';'
-                |   FieldList MethodDef
-                |   /* empty */
-                ;
+```text
+topLevel        ::= classList
+classList       ::= classList classDef | classDef
+classDef        ::= 'class' id extendsClause '{' fieldList '}'
+extendsClause   ::= 'extends' id | ε
+fieldList       ::= fieldList varDef ';' | fieldList methodDef | ε
 ```
 
 表示的是
 
-> 一个 TopLevel 有至少一个 ClassDef。
->
-> 一个 ClassDef 是 （可有可无的）abstract，之后 class Id，然后（可有可无的）extends Id，最后是大括号包起来的零或多个字段。
->
-> 一个字段可以是成员变量或者成员函数。
+- 一个 `topLevel` 有至少一个 `classDef`。
+- 一个 `classDef` 首先是关键字 `class`，跟上`id`，然后是一个可选的 `extendsClause`，最后是大括号包起来的零个或多个成员定义。
 
-我们可以写成如下形式，更精确和简明地反映上述含义
+我们可以写成如下 EBNF (Extended Backus–Naur Form)，更精确和简明地反映上述含义：
 
-```
-topLevel        :   classDef +
-                ;
-
-classDef        :   'abstract'? 'class' Id ('extends' Id)? '{' fieldDef* '}'
-                ;
-
-fieldDef        :   varDef ';'
-                |   methodDef
-                ;
+```text
+topLevel    ::= classDef+
+classDef    ::= 'class' id ('extends' id)? '{' fieldDef* '}'
+fieldDef    ::= varDef ';' | methodDef
 ```
 
-相当于我们允许产生式右边有一些拓展，如 `*`，`+` 等。具体的，我们允许
-* `+`：在它前面的符号出现一次或者多次
-* `*`：在它前面的符号出现零次或者多次
-* `?`：在它前面的符号出现零次或者一次
-* `'XXX'`：引号内原文出现
-* `(` `)`：分组。比如 `(Type Id ',')* Type Id` 就是非空参数列表（如`int a, int b, string c`）的一种描述
-* `|`：选择，原来也有，但是现在选择能出现在分组里了。例如 `s ::= ('a' | 'b') 'c'` 表示 `ac` 或者 `bc`。
+在 EBNF 中，各符号（或者符号串）允许添加如下拓展标记：
 
-这些拓展可以直接对应到 CFG，就像上面的例子中 `ClassList` 对应 `ClassDef+` 一样；
-但实际上“拓展”之后我们得到的文法表达能力不会比 CFG 更强，所谓“拓展”只是 CFG 的语法糖。
-事实上，最朴素的 CFG 对应 BNF（Backus–Naur Form），
-而加上这些拓展后就变成了 EBNF（Extended Backus–Naur Form）。
+- `+`：在它前面的符号（或者符号串）出现一次或者多次
+- `*`：在它前面的符号（或者符号串）出现零次或者多次
+- `?`：在它前面的符号（或者符号串）出现零次或者一次
+- `(` `)`：分组
+- `|`：选择，原来也有，但允许选择出现在分组里。例：`s ::= ('a' | 'b') 'c'` 等价于 `s ::= 'a' 'c' | 'b' 'c'`
 
-加入这些拓展可以有效简化语法。作为一个例子，Scala 版本使用的 ANTLR 4 就支持这些拓展。
-现在 [ANTLR 4 版本的文法文件](https://github.com/decaf-lang/decaf-in-scala/blob/master/src/main/antlr4/DecafParser.g4)的语法部分只有 80 行，
-而 Jacc 版本的语法部分有 126 行，多了 50% 以上。
-原始文件的话，Jacc 更不敌 ANTLR 4：Jacc 的 522 行是 ANTLR 128 行的好几倍。
+加入这些拓展可以有效简化语法。作为一个例子，Scala 版本使用的 Antlr4 就支持这些拓展。
+现在 [Antlr4 的文法描述文件](https://github.com/decaf-lang/decaf-in-scala/blob/master/src/main/antlr4/DecafParser.g4)的语法部分只有 80 行，
+而 Jacc 版本有 126 行，多了 50% 以上。
 > 备注：语法测量去除了文件头、语法动作、注释、空行，Scala 文法文件被改写成和 Java 版本一样的风格，2019 年 9 月 27 日测量。
 
-所以，后面我们会使用这种拓展的 CFG。
+所以，后面我们会使用 EBNF 来描述文法。
 另外的好处是，这样能够防止你们直接抄实验指导书。
 
 ## 实验内容
+
 本次实验给出了基础的 Decaf 框架，它完成了[《Decaf语言规范》](https://decaf-lang.gitbook.io/workspace/spec)。
 本次实验你的任务是，在这个框架的基础上，完成新特性的词法语法分析。
 
-我们给出的语法改动只是参考，你可以自由发挥，只要能通过测例。
+以下给出各新特性对应的语法规范。注意：这是规范而不是实现，你的实现应当符合此规范。
 
-### 新特性 1：抽象类。
+### 新特性 1：抽象类
+
 加入 `abstract` 关键字，用来修饰类和成员函数。例如，
-```
+
+```decaf
 abstract class Abstract {
     abstract void abstractMethod();
 }
 ```
 
-参考语法改动：从
-```
-classDef ::= 'class' Id  ('extends' Id)?  '{' field* '}'
+语法规范：将原来的
 
-methodDef ::= 'static'? type Id '(' paramList ')' block
+```text
+classDef ::= 'class' id  ('extends' id)?  '{' field* '}'
+methodDef ::= 'static'? type id '(' paramList ')' block
 ```
+
 变成
-```
-classDef ::= 'abstract'? 'class' Id  ('extends' Id)?  '{' field* '}'
 
-methodDef ::= 'static'? type Id '(' paramList ')' block
-            | 'abstract' type Id '(' paramList ')' ';'
+```text
+classDef ::= 'abstract'? 'class' id  ('extends' id)?  '{' field* '}'
+methodDef ::= 'static'? type id '(' paramList ')' block
+            | 'abstract' type id '(' paramList ')' ';'
 ```
 
 ### 新特性 2：局部类型推断
+
 加入 `var` 关键字，用来修饰**局部变量**。例如
-```
+
+```decaf
 class Main {
     static void main() {
         // int i = 0;
@@ -222,23 +195,23 @@ class Main {
 }
 ```
 
-参考语法：
+语法规范：
 
-```
+```text
 simpleStmt ::= ...
              | 'var' id '=' expr
 ```
 
-### 新特性 3：Lambda 表达式
-Lambda 表达式很复杂。幸运的是 PA1-A 中你只需考虑词法和语法分析的问题。
+### 新特性 3：First-class Functions
 
-具体地，你需要支持
+这是本学期新特性中最复杂的一部分。幸运的是，在 PA1-A 中你只需考虑词法和语法分析的问题。
+具体地，你需要支持以下三种新语法：
 
-* **函数类型**：语法如
+#### 函数类型
 
-参考语法：
+语法规范：
 
-```
+```text
 type ::= ...
        | type '(' typeList ')'
 
@@ -247,39 +220,47 @@ typeList ::= (type (',' type)*)?
 
 括号左边的是返回值的类型，括号内的是诸参数的类型。
 
+#### Lambda 表达式
 
-* **lambda 表达式**：有两种, block lambda 和 expression lambda。lambda 表达式的类型是函数类型。
+有两种, block lambda 和 expression lambda。Lambda 表达式的类型是函数类型。
 
-参考语法：
+语法规范：
 
-```
+```text
 type ::= ...
        | 'fun' '(' paramList ')' '=>' expr
        | 'fun' '(' paramList ')' block
 
-paramList ::= (type Id (',' type Id)*)?
+paramList ::= (type id (',' type id)*)?
 ```
 
-其中箭头 `'=>'` 左边的是参数列表，右边是返回值。
-Block lambda 可以包含 return 语句表示返回值（当然，没有 return 语句的话返回类型 void）。
+其中新增的箭头操作符 `'=>'` 左边是参数列表，右边是返回值。`'=>'` 的优先级最低。
+`fun` 为新增的关键字。
+Block lambda 可以包含 return 语句表示返回值（当然，没有 return 语句的话返回类型是 void）。
 
-* **函数调用**：原来只能调用任何成员函数，现在可以调用任意表达式了。
+#### 函数调用
 
-参考语法改动：从
+原来只能调用成员方法和静态方法，现在可以调用任意类型为函数类型的表达式（其本质就是个函数）。
+
+语法规范：将原来的
+
+```text
+call ::= (expr '.')? id '(' exprList ')'
 ```
-call ::= (expr '.')? Id '(' exprList ')'
-```
+
 变为
-```
+
+```text
 call ::= expr '(' exprList ')'
 ```
 
-### lambda 表达式的例子
+#### 补充：Lambda 表达式的例子
+
 对部分同学，lambda 表达式还是个新东西。所以下面是一些例子，帮助你理解。
 
-* 函数类型
+函数类型：
 
-```
+```decaf
 void()               // 没有参数，返回类型 void
 
 int(int)             // 接受一个 int 类型的参数，返回 int
@@ -290,66 +271,187 @@ class Main(int, int) // 接受两个 int 类型的参数，返回 Main 的一个
 
 int(int(int))        // 参数是一个 int 到 int 的函数，返回值是 int
 
-int(int)(int)        // 参数是一个 int，返回一个 int 到 int 的函数（返回值还可以继续接受参数）
+int(int)(int)        // 参数是一个 int，返回一个 int 到 int 的函数（注意这里的返回值也是一个函数）
 ```
 
-* lambda 表达式
+Lambda 表达式：
 
-```
-(int x) => x + 1                                      // 类型是 int(int)
+```decaf
+fun (int x) => x + 1            // 类型是 int(int)
 
-(int x, int y) => x + y                               // 类型是 int(int, int)
+fun (int x, int y) => x + y     // 类型是 int(int, int)
 
-(int x) => { if (x == 0) return "no"; return "yes"; } // 类型是 string(int)
+fun (int x) => { if (x == 0) return "no"; return "yes"; }   // 类型是 string(int)
 
-(int x) => (int y) => x + y                           // 类型是 (int(int))(int).
+fun (int x) => (int y) => x + y
+// 类型是 (int(int))(int)
 // 上面一个函数是所谓 curry function 的例子。其实它就是 x+y，但是它不要求你把两个参数一次性都提供了。
 // 而是先接受第一个参数 x，然后返回一个函数。被返回的函数还能接受参数 y。
 // 比如这个函数接受参数 x=2 之后，返回一个函数 (int y) => 2 + y。
 // 这个被返回的函数再接受 y=3，返回最终结果 2+3=5。
 
-(int(int) f, int[] arr) => { for (int i = 0; i < arr.length(); i = i + 1) arr[i] = f(arr[i]); }
-                                                      // 类型是 void(int(int), int[])
-// 前面的例子是返回值为 lambda 的情况，这个例子是 lambda 作为参数的情况。
-// 函数的意思很明显，不用解释了。
+fun (int(int) f, int[] arr) => { for (int i = 0; i < arr.length(); i = i + 1) arr[i] = f(arr[i]); }
+// 类型是 void(int(int), int[])
+// 前面的例子是返回值为 lambda 的情况，这个例子是 lambda 作为参数的情况
+// 函数的意思很明显，不用解释了
 ```
 
-* 函数调用
+函数调用：
 
-```
-int(int)(int) f = (int x) => (int y) => x + y;
-Print(f(2)(3));                                     // 输出 5。这里有两次函数调用（不含 Print）！
+```decaf
+var f = (int x) => (int y) => x + y; // f 的类型是 int(int)(int)
+Print(f(2)(3));  // 输出 5。这里有两次函数调用（不含 Print）
 ```
 
 > 一个小故事：
 >
-> 我们采用 C / C++ 风格来写函数类型。你可能觉得这种写法很怪。
+> 我们采用 C / C++ 风格来写函数类型。你可能觉得这种写法很怪。这样设计主要是为了让 PA1-B 阶段更容易。
 > 还有更怪的：C 中声明一个函数指针 `a` 要写成 `int (*a)(int, int);`
 > 但是，你可以认为这样的类型写法指明的是 “我们应该如何使用这个类型的变量”
 > 比如上面的 `a`，它的用法是 `int b = (*a)(4, 5)` -- 和签名太像了。
 > 也许这也能帮助你理解，为什么 C 和 C++ 数组声明是 `int a[10]` 而不是 `int[10] a`，
 > 以及为什么有些人写 `char *a` 而不是 `char* a`。
 
+### AST 格式化打印
+
+在 PA1-A 阶段，我们最终会将你构造出来的 AST 进行格式化打印，并与标准输出比对是否一致。
+所有 AST 结点的打印格式都遵循如下流程：
+
+1. 打印结点名称
+2. 增加缩进
+3. 遍历所有元素（子树），依次递归打印它们
+4. 减少缩进
+
+新增特性的打印格式如下：
+
+#### 抽象类/方法
+
+打印抽象类/方法时，其修饰符 `abstract` 打印为 `ABSTRACT`。如
+
+```decaf
+abstract void foo();
+```
+
+对应的 AST 打印为（省略了位置，下同）
+
+```text
+MethodDef @ ...
+    ABSTRACT
+    foo
+    TVoid @ ...
+    List
+        <empty>
+    <none>
+```
+
+#### `var` 局部变量定义
+
+打印用 `var` 修饰的局部变量定义时，按照标准的 `LocalVarDef` 来打印，只不过将其第一个元素（类型）打印为空 `<none>`。如
+
+```decaf
+var a = 5;
+```
+
+对应的 AST 打印为
+
+```text
+LocalVarDef @ ...
+    <none>
+    a
+    IntLit @ ...
+        5
+```
+
+#### 函数类型
+
+结点名称为 `TLambda`。包含两个元素：第一个元素是返回值类型。第二个元素一个类型的列表，分别表示其参数类型。如
+
+```decaf
+void(int, int)
+```
+
+对应的 AST 打印为
+
+```text
+TLambda @ ...
+    TVoid @ ...
+    List
+        TInt @ ...
+        TInt @ ...
+```
+
+#### Lambda 表达式
+
+结点名称为 `Lambda`。包含两个元素：第一个元素是参数列表，各参数按照 `LocalVarDef` 来打印。
+第二个元素是返回值，它可能是一个表达式，也可能是一个语句块。如
+
+```decaf
+fun (int x) => x + 1
+```
+
+对应的 AST 打印为
+
+```text
+Lambda @ ...
+    List
+        LocalVarDef @ ...
+            TInt @ ...
+            x
+            <none>
+    Binary @ ...
+        ADD
+        VarSel @ ...
+            <none>
+            x
+        IntLit @ ...
+            1
+```
+
+#### 函数调用
+
+结点名称为 `Call`。包含两个元素：第一个元素是一个表达式，代表要调用的函数。
+第二个元素是表达式的列表，代表调用参数。如
+
+```decaf
+apply(f, 12)
+```
+对应的 AST 打印为
+
+```text
+Call @ ...
+    VarSel @ ...
+        <none>
+        apply
+    List
+        VarSel @ ...
+            <none>
+            f
+        IntLit @ ...
+            12
+```
+
+测例中给出了更多标准输出作为例子。
+在实验开始前，建议你阅读所使用框架的实验指导书，搞清楚框架是如何定义各 AST 结点，并完成格式化打印的。
+
 ## 实验评分和实验报告
-实验评分分两部分
-* 评测结果：80%。这部分是机器检查，要求你的输出和标准输出**一模一样**。我们会有未公开的测例。
-* 实验报告（根目录下 `report-PA1-A.pdf` 文件）：20%。用中文简要叙述你的工作内容。
 
-要求实验报告中回答以下问题：
+实验评分分两部分：
 
-1. 我们用 `Tree` 里面的嵌套类表示抽象语法树的结点。但这些嵌套类间还有继承关系。
-  如果 A 继承了 B，那么语法上会不会 A 和 B 有什么关系？限用 100 字符内一句话说明。
+- 评测结果：80%。这部分是机器检查，要求你的输出和标准输出**一模一样**。我们会有**未公开**的测例。
+- 实验报告（根目录下 `report-PA1-A.pdf` 文件）：20%。要求用中文简要叙述你的工作内容。此外，请在报告中回答以下问题：
 
-2. Tree 的嵌套类和 SemValue 似乎有很多类似的地方，但他们有什么区别？限用 60 字符内的一句话说明。
+1. AST 结点间是有继承关系的。若结点 `A` 继承了 `B`，那么语法上会不会 `A` 和 `B` 有什么关系？限用 100 字符内一句话说明。
 
-3. 你如何保证 `=>` 是右结合的？
+2. 原有框架是如何解决空悬 else (dangling-else) 问题的？限用 100 字符内说明。
 
-4. PA1-A 在概念上，如下图所示。输入程序 lex **做完**得到一个终结符序列，然后在**构建出**具体语法树，最后从具体语法树构建抽象语法树。
-  这个概念模型和我们的代码有什么区别？我们的具体语法树在哪里？限用 120 字符内说明。
+3. PA1-A 在概念上，如下图所示：
 
+```text
+作为输入的程序（字符串）
+    --> lexer --> 单词流 (token stream)
+    --> parser --> 具体语法树 (CST)
+    --> 一通操作 --> 抽象语法树 (AST)
 ```
-作为输入的程序：char[]
-    --> lexer --> 终结符序列：Token[]
-    --> parser --> 具体语法树：Tree<CSTNode>
-    --> 一通操作 --> 抽象语法树：Tree<ASTNode>
-```
+
+输入程序 lex 完得到一个终结符序列，然后构建出具体语法树，最后从具体语法树构建抽象语法树。
+这个概念模型与框架的实现有什么区别？我们的具体语法树在哪里？限用 120 字符内说明。
