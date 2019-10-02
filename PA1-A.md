@@ -299,7 +299,7 @@ fun (int(int) f, int[] arr) => { for (int i = 0; i < arr.length(); i = i + 1) ar
 函数调用：
 
 ```decaf
-var f = (int x) => (int y) => x + y; // f 的类型是 int(int)(int)
+var f = fun (int x) => fun (int y) => x + y; // f 的类型是 int(int)(int)
 Print(f(2)(3));  // 输出 5。这里有两次函数调用（不含 Print）
 ```
 
