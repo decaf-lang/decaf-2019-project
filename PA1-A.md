@@ -281,7 +281,7 @@ fun (int x) => x + 1            // 类型是 int(int)
 
 fun (int x, int y) => x + y     // 类型是 int(int, int)
 
-fun (int x) => { if (x == 0) return "no"; return "yes"; }   // 类型是 string(int)
+fun (int x) { if (x == 0) return "no"; return "yes"; }   // 类型是 string(int)
 
 fun (int x) => fun (int y) => x + y
 // 类型是 (int(int))(int)
@@ -290,7 +290,7 @@ fun (int x) => fun (int y) => x + y
 // 比如这个函数接受参数 x=2 之后，返回一个函数 (int y) => 2 + y。
 // 这个被返回的函数再接受 y=3，返回最终结果 2+3=5。
 
-fun (int(int) f, int[] arr) => { for (int i = 0; i < arr.length(); i = i + 1) arr[i] = f(arr[i]); }
+fun (int(int) f, int[] arr) { for (int i = 0; i < arr.length(); i = i + 1) arr[i] = f(arr[i]); }
 // 类型是 void(int(int), int[])
 // 前面的例子是返回值为 lambda 的情况，这个例子是 lambda 作为参数的情况
 // 函数的意思很明显，不用解释了
