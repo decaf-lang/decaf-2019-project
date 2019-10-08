@@ -147,7 +147,7 @@ Java 版本使用 gradle 构建，前端使用 [JFlex](https://jflex.de) 和 [Ja
   - 运行命令 `java -version` 检查输出是否是 java version "12..."
   - 可以将 `decaf` 命令别名成 `java -jar --enable-preview /project_top/build/libs/decaf.jar` 方便调试
 
-* 安装 gradle，要求版本**至少 5.4**
+* 安装 gradle，要求版本**至少 5.2**
   - 运行命令 `gradle -v` 检查版本，注意保证 gradle 使用的 JVM 版本和 java 12 的版本一致
 
 * [可选] 集成开发环境
