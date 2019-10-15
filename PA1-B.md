@@ -164,7 +164,9 @@ if ($1.expr instanceof LValue) {
 
 在完成错误恢复后，请确保这些测例均能被正确处理——**既不漏报，也不误报**。
 
-最新的 `testAll.py` 脚本会自动忽略部分测例（包括上面提到的 `S1/lambdabad1.decaf`）。脚本运行命令为：`./testAll.py PA1-B`。
+> 注意：`S1/` 中有三个测例需要被忽略：`abstract1.decaf`, `abstract3.decaf`, `lambdabad1.decaf`。
+> 最新的 `testAll.py` 脚本已自动忽略。脚本运行命令为：`./testAll.py PA1-B`。
+> 使用 Rust 版的同学请手工忽略它们。
 
 ## 实验评分和实验报告
 
