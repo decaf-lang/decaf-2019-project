@@ -46,7 +46,7 @@ class Baz extends Foo {
 }
 ```
 
-报错信息均为：'Foo' is not abstract and does not override all abstract methods
+报错信息分别为：'Foo' is not abstract and does not override all abstract methods 和 'Baz' is not abstract and does not override all abstract methods
 
 **错误2：**抽象类不能使用 'new' 进行实例化。
 
