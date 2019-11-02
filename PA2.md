@@ -440,7 +440,7 @@ call ::= expr '(' exprList ')'
 
 ### 符号表格式化打印
 
-在 PA2 阶段，我们最终会将你构造出来的作用域和符号表进行格式化打印，并与标准输出比对是否一致。该部分已实现在 `src/main/java/decaf/printing/PrettyScope/java` 中，对于一个作用域，打印格式都遵循如下流程：
+在 PA2 阶段，我们最终会将你构造出来的作用域和符号表进行格式化打印，并与标准输出比对是否一致。基础框架已实现该功能(如 Java 版在 `src/main/java/decaf/printing/PrettyScope.java`)，对于一个作用域，打印格式都遵循如下流程：
 
 1. 打印作用域名(`GlOBAL`、`CLASS`、`FORMAL`、`LOCAL`)
 2. 增加缩进
@@ -465,7 +465,7 @@ class Main {
 
 对应的符号表打印为：
 
-```text
+```
 GLOBAL SCOPE:
     (1,10) -> ABSTRACT class Foo
     (4,1) -> class Main
@@ -495,7 +495,7 @@ static void main() {
 
 对应的符号表打印为：
 
-```text
+```
 ...
 FORMAL SCOPE OF 'main':
     <empty>
@@ -509,7 +509,7 @@ FORMAL SCOPE OF 'main':
 
 与局部作用域 `LocalScope` 一样，符号包括参数和其内部定义的变量，如
 
-```decaf
+```java
 static void main() {
     var f = fun(int x) {
         var g = fun(int y) => x + y;
@@ -519,7 +519,7 @@ static void main() {
 
 对应的符号表打印为：
 
-```text
+```
 ...
 FORMAL SCOPE OF 'main':
     <empty>
