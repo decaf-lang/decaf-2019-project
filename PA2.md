@@ -37,36 +37,36 @@
 
 * 错例 1-1：
 
-    ```java
-    class Foo {
-        abstract int foo();
-        abstract string bar();
-    }
-    ```
+  ```java
+  class Foo {
+      abstract int foo();
+      abstract string bar();
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (1,5): 'Foo' is not abstract and does not override all abstract methods
-    ```
+  ```
+  *** Error at (1,5): 'Foo' is not abstract and does not override all abstract methods
+  ```
 
 * 错例 1-2：
 
-    ```java
-    abstract class Foo {
-        abstract int foo();
-    }
+  ```java
+  abstract class Foo {
+      abstract int foo();
+  }
 
-    class Baz extends Foo {
-        int baz() { return 1; }
-    }
-    ```
+  class Baz extends Foo {
+      int baz() { return 1; }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (5,5): 'Baz' is not abstract and does not override all abstract methods
-    ```
+  ```
+  *** Error at (5,5): 'Baz' is not abstract and does not override all abstract methods
+  ```
 
 在实现上，可对每个类记录它所有“未被重载的抽象方法”列表。每当处理一个类时，先处理其父类，然后将该列表初始化为父类的列表。之后每遇到一个抽象方法，将方法名加入该列表；每重载了一个抽象方法，从列表中删去该方法。如果最后列表非空则该类需要是抽象的。
 
@@ -76,23 +76,23 @@
 
 * 错例 1-3：
 
-    ```java
-    abstract class Foo {
-        abstract int foo();
-    }
+  ```java
+  abstract class Foo {
+      abstract int foo();
+  }
 
-    class Main {
-        static void main() {
-            new Foo();
-        }
-    }
-    ```
+  class Main {
+      static void main() {
+          new Foo();
+      }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (7,13): cannot instantiate abstract class 'Foo'
-    ```
+  ```
+  *** Error at (7,13): cannot instantiate abstract class 'Foo'
+  ```
 
 ### 新特性 2：局部类型推导
 
@@ -102,30 +102,30 @@
 
 * 例 2-1：
 
-    ```java
-    class A {}
-    class B extends A {}
+  ```java
+  class A {}
+  class B extends A {}
 
-    class Main {
-        static void main() {
-            var i = 1;
-            var s = "123";
-            var a = new int[233];
-            var f = fun (int x) => fun (int y) => x;
-            var b = new B();
-        }
-    }
-    ```
+  class Main {
+      static void main() {
+          var i = 1;
+          var s = "123";
+          var a = new int[233];
+          var f = fun (int x) => fun (int y) => x;
+          var b = new B();
+      }
+  }
+  ```
 
-    对于上述程序，各变量的的类型分别推导为：
+  对于上述程序，各变量的的类型分别推导为：
 
-    ```
-    i : int
-    s : string
-    a : int[]
-    f : int => int => int
-    b : class B
-    ```
+  ```
+  i : int
+  s : string
+  a : int[]
+  f : int => int => int
+  b : class B
+  ```
 
 #### 报错
 
@@ -133,19 +133,19 @@
 
 * 错例 2-2：
 
-    ```java
-    class Main {
-        static void main() {
-            var m = main();
-        }
-    }
-    ```
+  ```java
+  class Main {
+      static void main() {
+          var m = main();
+      }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (3,13): cannot declare identifier 'm' as void type
-    ```
+  ```
+  *** Error at (3,13): cannot declare identifier 'm' as void type
+  ```
 
 ### 新特性 3：First-class Functions
 
@@ -174,19 +174,19 @@
 
 * 错例 3-1：
 
-    ```java
-    class Main {
-        static void main() {
-            int(int, void) f;
-        }
-    }
-    ```
+  ```java
+  class Main {
+      static void main() {
+          int(int, void) f;
+      }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (3,18): arguments in function type must be non-void known type
-    ```
+  ```
+  *** Error at (3,18): arguments in function type must be non-void known type
+  ```
 
 #### Lambda 表达式作用域
 
@@ -204,68 +204,68 @@
 
 * 错例 3-2：
 
-    ```java
-    class Main {
-        static void main() {
-            int x = 0;
-            var addx = fun() {
-                x = x + 1;
-                int[] y = new int[10];
-                var addy = fun() {
-                    y[0] = y[0] + 1;
-                };
-            };
-        }
-    }
-    ```
+  ```java
+  class Main {
+      static void main() {
+          int x = 0;
+          var addx = fun() {
+              x = x + 1;
+              int[] y = new int[10];
+              var addy = fun() {
+                  y[0] = y[0] + 1;
+              };
+          };
+      }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (5,15): cannot assign value to captured variables in lambda expression
-    ```
+  ```
+  *** Error at (5,15): cannot assign value to captured variables in lambda expression
+  ```
 
 * 错例 3-3：
 
-    ```java
-    class Main {
-        static void main() {
-            var f = fun (int x) {
-                var g = fun (int y) => x + y;
-                var h = fun (int z) {
-                    var f1 = f;
-                    var g1 = g;
-                    var h1 = h;
-                };
-            };
-        }
-    }
-    ```
+  ```java
+  class Main {
+      static void main() {
+          var f = fun (int x) {
+              var g = fun (int y) => x + y;
+              var h = fun (int z) {
+                  var f1 = f;
+                  var g1 = g;
+                  var h1 = h;
+              };
+          };
+      }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (6,26): undeclared symbol 'f'
-    *** Error at (8,26): undeclared symbol 'h'
-    ```
+  ```
+  *** Error at (6,26): undeclared symbol 'f'
+  *** Error at (8,26): undeclared symbol 'h'
+  ```
 
 * 错例 3-4：
 
-    ```java
-    class Main {
-        static void main() {
-            var f = fun (int x) {
-                var f = fun (int y) => x + y;
-            };
-        }
-    }
-    ```
+  ```java
+  class Main {
+      static void main() {
+          var f = fun (int x) {
+              var f = fun (int y) => x + y;
+          };
+      }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (4,17): declaration of 'f' here conflicts with earlier declaration at (3,13)
-    ```
+  ```
+  *** Error at (4,17): declaration of 'f' here conflicts with earlier declaration at (3,13)
+  ```
 
 在实现上，为了后续返回类型推导以及代码生成(PA3)的方便，我们建议你对 Lambda 表达式定义一种新的作用域 `LambdaScope`，定义一种新的符号 `LambdaSymbol`，以便对 Lambda 表达式具有的属性进行更好的管理。当然我们不会评估你是否真的做了这件事，用自己认为方便的方法实现即可。
 
@@ -286,63 +286,63 @@
 
 * 例 3-5：
 
-    ```java
-    class A {}
-    class B extends A {}
+  ```java
+  class A {}
+  class B extends A {}
 
-    class Main {
-        static void main() {
-            var abs = fun (int x) {
-                if (x >= 0)
-                    return x;
-                else
-                    return -x;
-            };
-            var print = fun (int x) {
-                if (x < 0) return;
-                Print(x);
-            };
-            var test = fun (class A a, class B b) {
-                if (false)
-                    return fun (class A a1, class B b1) => a;
-                else
-                    return fun (class B b2, class A a2) => b;
-            };
-        }
-    }
-    ```
+  class Main {
+      static void main() {
+          var abs = fun (int x) {
+              if (x >= 0)
+                  return x;
+              else
+                  return -x;
+          };
+          var print = fun (int x) {
+              if (x < 0) return;
+              Print(x);
+          };
+          var test = fun (class A a, class B b) {
+              if (false)
+                  return fun (class A a1, class B b1) => a;
+              else
+                  return fun (class B b2, class A a2) => b;
+          };
+      }
+  }
+  ```
 
-    三个 Lambda 表达式类型分别为：
+  三个 Lambda 表达式类型分别为：
 
-    ```
-    abs : int => int
-    print : int => void
-    test : (class A, class B) => (class B, class B) => class A
-    ```
+  ```
+  abs : int => int
+  print : int => void
+  test : (class A, class B) => (class B, class B) => class A
+  ```
 
 * 错例 3-6：
 
-    ```java
-    class Main {
-        static void main() {
-            var cmp = fun (int x) {
-                if (x > 0)
-                    return 1;
-                else if (x < 0)
-                    return "-1";
-                else
-                    Print("equal");
-            };
-        }
-    }
-    ```
+  ```java
+  class Main {
+      static void main() {
+          var cmp = fun (int x) {
+              if (x > 0)
+                  return 1;
+              else if (x < 0)
+                  return "-1";
+              else
+                  Print("equal");
+          };
+      }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (3,31): missing return statement: control reaches end of non-void block
-    *** Error at (3,31): incompatible return types in blocked expression
-    ```
+  ```
+  *** Error at (3,31): missing return statement: control reaches end of non-void block
+  *** Error at (3,31): incompatible return types in blocked expression
+  ```
 
 实现时，对每个 Lambda 表达式你需要先想办法得到它内部的所有 `return` 语句，然后可用递归的方式求它们类型的上界。
 
@@ -354,32 +354,32 @@
 
 * 错例 3-7：
 
-    ```java
-    class A {
-        static int sf(int x) { return x - 1; }
-        int(int) vf;
-    }
+  ```java
+  class A {
+      static int sf(int x) { return x - 1; }
+      int(int) vf;
+  }
 
-    class Main {
-        int f(int x) { return x + 2; }
+  class Main {
+      int f(int x) { return x + 2; }
 
-        static void main() {
-            var a = new A();
-            var f1 = f;         // bad
-            var f2 = a.sf;
-            var f3 = a.vf;      // bad
-        }
-    }
-    ```
+      static void main() {
+          var a = new A();
+          var f1 = f;         // bad
+          var f2 = a.sf;
+          var f3 = a.vf;      // bad
+      }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (11,18): can not reference a non-static field 'f' from static method 'main'
-    *** Error at (13,20): field 'vf' of 'class A' not accessible here
-    ```
+  ```
+  *** Error at (11,18): can not reference a non-static field 'f' from static method 'main'
+  *** Error at (13,20): field 'vf' of 'class A' not accessible here
+  ```
 
-    `f1` 是因为在 `class Main` 的 `static` 方法里访问了非 `static` 字段；`f3` 是因为在 `class Main` 里无法访问 `class A` 的私有字段；而 `f2` 赋值成功，具有类型 `int => int`。
+  `f1` 是因为在 `class Main` 的 `static` 方法里访问了非 `static` 字段；`f3` 是因为在 `class Main` 里无法访问 `class A` 的私有字段；而 `f2` 赋值成功，具有类型 `int => int`。
 
 #### 函数调用
 
@@ -403,45 +403,45 @@ call ::= expr '(' exprList ')'
 
 * 错例 3-8：
 
-    ```java
-    class Main {
-        static void main() {
-            var str = "2333";
-            str(2333);
-        }
-    }
-    ```
+  ```java
+  class Main {
+      static void main() {
+          var str = "2333";
+          str(2333);
+      }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (4,12): string is not a callable type
-    ```
+  ```
+  *** Error at (4,12): string is not a callable type
+  ```
 
 如果参数个数或类型不匹配也要报错：
 
 * 错例 3-9：
 
-    ```java
-    class Main {
-        static void main() {
-            var f = fun(int x, int y) => x + y;
-            f(1);
-            f(1, "2");
-            (fun (int x, int y) => x * y)(1, 2, 3);
-        }
-    }
-    ```
+  ```java
+  class Main {
+      static void main() {
+          var f = fun(int x, int y) => x + y;
+          f(1);
+          f(1, "2");
+          (fun (int x, int y) => x * y)(1, 2, 3);
+      }
+  }
+  ```
 
-    报错：
+  报错：
 
-    ```
-    *** Error at (4,10): function 'f' expects 2 argument(s) but 1 given
-    *** Error at (5,14): incompatible argument 2: string given, int expected
-    *** Error at (6,38): lambda expression expects 2 argument(s) but 3 given
-    ```
+  ```
+  *** Error at (4,10): function 'f' expects 2 argument(s) but 1 given
+  *** Error at (5,14): incompatible argument 2: string given, int expected
+  *** Error at (6,38): lambda expression expects 2 argument(s) but 3 given
+  ```
 
-    注意当参数个数不匹配时，如果被调用者有符号名(如第一个错误)，应该输出 `function 'name' expects x argument(s) but y given`，如果被调用者是个表达式没有符号名(如第三个错误)，只需输出 `lambda expression expects x argument(s) but y given`。
+  注意当参数个数不匹配时，如果被调用者有符号名(如第一个错误)，应该输出 `function 'name' expects x argument(s) but y given`，如果被调用者是个表达式没有符号名(如第三个错误)，只需输出 `lambda expression expects x argument(s) but y given`。
 
 其余诸如方法访问权限的错误，已在上一节“函数变量”中报过，此时无需再报。
 
