@@ -197,7 +197,7 @@
 
 而不同之处在于：
 
-1. 不能对捕获的外层作用域中的符号进行赋值。
+1. 不能对捕获的外层作用域中的符号**直接**赋值，但如果传入的是一个对象或数组的引用，可以通过该引用修改类的成员或数组元素。
 2. 如果要将 Lambda 表达式赋值给一个符号，则 Lambda 内部作用域中的变量既不能与该符号重名，也不能访问到该符号。
 
 例子：
@@ -206,14 +206,19 @@
 
   ```java
   class Main {
+      int v;
       static void main() {
-          int x = 0;
+          var x = new int[10];
+          var m = new Main();
           var addx = fun() {
-              x = x + 1;
-              int[] y = new int[10];
+              x[0] = x[0] + 1;        // ok
+              int y = 0;
               var addy = fun() {
-                  y[0] = y[0] + 1;
+                  y = y + 1;          // bad
+                  m.v = 1;            // ok
               };
+              y = -1;                 // ok
+              m = null;               // bad
           };
       }
   }
@@ -222,7 +227,8 @@
   报错：
 
   ```
-  *** Error at (5,15): cannot assign value to captured variables in lambda expression
+  *** Error at (10,19): cannot assign value to captured variables in lambda expression
+  *** Error at (14,15): cannot assign value to captured variables in lambda expression
   ```
 
 * 错例 3-3：
@@ -233,9 +239,9 @@
           var f = fun (int x) {
               var g = fun (int y) => x + y;
               var h = fun (int z) {
-                  var f1 = f;
+                  var f1 = f;       // bad
                   var g1 = g;
-                  var h1 = h;
+                  var h1 = h;       // bad
               };
           };
       }
@@ -245,8 +251,8 @@
   报错：
 
   ```
-  *** Error at (6,26): undeclared symbol 'f'
-  *** Error at (8,26): undeclared symbol 'h'
+  *** Error at (6,26): undeclared variable 'f'
+  *** Error at (8,26): undeclared variable 'h'
   ```
 
 * 错例 3-4：

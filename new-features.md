@@ -291,49 +291,51 @@ func.a = a; // 拷贝作用域中存在的那个 `a` 的引用
 
 由于这段代码是自动生成的 (synthetic)，我们可以突破成员变量 protected 的束缚。
 
-若 Lambda 表达式函数体内对于某个本地变量进行了赋值，那么为了保证该本地变量下次读取时确实是更新了的值，我们必须捕获这个变量的引用。因此，对于 IntType 就不得不特殊处理，所以可暂时规定不能对整数赋值。但是对其他类型赋值，按照上述实现是可行的，如：
+若 Lambda 表达式函数体内对于某个本地变量进行了赋值，那么为了保证该本地变量下次读取时确实是更新了的值，我们必须捕获这个变量的引用。简单起见，我们规定不能对一个变量直接赋值(无论是传值还是引用)，但如果传入 Lambda 表达式的是一个对象或数组的引用，则可以通过该引用修改类的成员或数组元素。
 
 ```
 class Foo {
     // ...
+    int v;
     void foo() {
         var x = 5;          // x : int
-        var a = new A();    // a : class A
+        var a = new Foo();  // a : class Foo
         var func = fun (int y) {
-            a = null;
+            a.v = y;
             return x + y;
         }
 
         func(10);
-        a; // --> a == null
+        a.v; // --> a.v == 10
     }
 }
 ```
 
-代码执行后 `a` 应为 `null`。解开 Lambda 后：
+代码执行后 `a.v` 应为 `10`。解开 Lambda 后：
 
 ```
 class Lambda$1 extends Lambda$int$int {
     int x;
-    class A a;
+    class Foo a;
 
     int apply(int y) {
-        a = null;
+        a.v = y;
         return x + y;
     }
 }
 
 class Foo {
     // ...
+    int v;
     void foo() {
         var x = 5;          // x : int
-        var a = new A();    // a : class A
+        var a = new Foo();  // a : class A
         var func = new Lambda$1();
         func.x = x;
         func.a = a;
 
-        func.apply(10); // func.a == a == null
-        a; // --> a == null
+        func.apply(10); // func.a.v == a.v == 10
+        a.v; // --> a.v == 10
     }
 }
 ```
