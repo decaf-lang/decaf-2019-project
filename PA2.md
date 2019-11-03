@@ -190,7 +190,7 @@
 
 #### Lambda 表达式作用域
 
-当定义一个 Lambda 表达式时，相当于打开了一层新的局部作用域 `LocalScope`，包含所有参数与内部声明的变量。作用域中变量的访问规则与普通局部作用域类似：
+当定义一个 Lambda 表达式时，可认为和定义函数类似，打开了一层新的参数作用域 `FormalScope`，存放各参数对应的变量符号，里面再是一层局部作用域 `LocalScope`。作用域中变量的访问规则与普通局部作用域类似：
 
 1. 内层作用域可以访问到外层作用域的所有符号。
 2. 在局部作用域中声明的符号不能与与任何外层作用域的符号重名。
@@ -273,7 +273,7 @@
   *** Error at (4,17): declaration of 'f' here conflicts with earlier declaration at (3,13)
   ```
 
-在实现上，为了后续返回类型推导以及代码生成(PA3)的方便，我们建议你对 Lambda 表达式定义一种新的作用域 `LambdaScope`，定义一种新的符号 `LambdaSymbol`，以便对 Lambda 表达式具有的属性进行更好的管理。当然我们不会评估你是否真的做了这件事，用自己认为方便的方法实现即可。
+此外，为了后续代码生成的方便，Lambda 表达式也需要有相应的符号。我们建议你对 Lambda 表达式定义一种新的作用域 `LambdaScope`，定义一种新的符号 `LambdaSymbol`，以便对 Lambda 表达式具有的属性进行更好的管理。当然我们不会评估你是否真的做了这件事，用自己认为方便的方法实现即可。
 
 #### Lambda 表达式返回类型
 
@@ -520,12 +520,12 @@ FORMAL SCOPE OF 'main':
 
 #### Lambda 表达式
 
-与局部作用域 `LocalScope` 一样，符号包括参数和其内部定义的变量，如
+与函数定义类型，先是参数作用域 `FormalScope`，然后依次打印各参数，最后再是内部是局部作用域 `LocalScope`。注意每个 Lambda 表达式也是一个符号，有自己的符号名，规定 Lambda 表达式符号名的输出格式为 `lambda@(x,y)`，其中 (x, y) 为 Lambda 表达式在源码中的位置。如：
 
 ```java
 static void main() {
-    var f = fun(int x) {
-        var g = fun(int y) => x + y;
+    var f = fun() {
+        var g = fun(int x) => x;
     };
 }
 ```
@@ -537,12 +537,17 @@ static void main() {
 FORMAL SCOPE OF 'main':
     <empty>
     LOCAL SCOPE:
-        (6,13) -> variable f : int => void
-        LOCAL SCOPE:
-            (6,25) -> variable x : int
-            (7,17) -> variable g : int => int
+        (3,9) -> variable f : () => void
+        (3,13) -> function lambda@(3,13) : () => void
+        FORMAL SCOPE OF 'lambda@(3,13)':
+            <empty>
             LOCAL SCOPE:
-                (7,29) -> variable y : int
+                (4,13) -> variable g : int => int
+                (4,17) -> function lambda@(4,17) : int => int
+                FORMAL SCOPE OF 'lambda@(4,17)':
+                    (4,25) -> variable @x : int
+                    LOCAL SCOPE:
+                        <empty>
 ```
 
 ## 实验评分和实验报告
