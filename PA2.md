@@ -223,7 +223,6 @@
 
     ```
     *** Error at (5,15): cannot assign value to captured variables in lambda expression
-    *** Error at (8,22): cannot assign value to captured variables in lambda expression
     ```
 
 * 错例 3-3：
@@ -232,7 +231,12 @@
     class Main {
         static void main() {
             var f = fun (int x) {
-                var g = f;
+                var g = fun (int y) => x + y;
+                var h = fun (int z) {
+                    var f1 = f;
+                    var g1 = g;
+                    var h1 = h;
+                };
             };
         }
     }
@@ -241,7 +245,8 @@
     报错：
 
     ```
-    *** Error at (4,21): undeclared variable 'f'
+    *** Error at (6,26): undeclared symbol 'f'
+    *** Error at (8,26): undeclared symbol 'h'
     ```
 
 * 错例 3-4：
