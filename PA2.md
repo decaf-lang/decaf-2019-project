@@ -12,7 +12,7 @@
 
 * [Java](https://decaf-lang.gitbook.io/decaf-book/java-kuang-jia-fen-jie-duan-zhi-dao/pa2-yu-yi-fen-xi)
 * [Scala](https://decaf-lang.gitbook.io/decaf-book/scala-kuang-jia-fen-jie-duan-zhi-dao/pa2-yu-yi-fen-xi)
-* [Rust](https://decaf-lang.gitbook.io/decaf-book/rust-kuang-jia-fen-jie-duan-zhi-dao/pa2-yu-yi-fen-xi)
+* [Rust](https://decaf-lang.gitbook.io/decaf-book/rust-kuang-jia-fen-jie-duan-zhi-dao/pa2-yu-yi-fen-xi) (这个文档不一定是最新的，建议使用[这个文档](https://mashplant.gitbook.io/decaf-doc/pa2/shi-yan-nei-rong))
 
 简单来说，语义分析需要遍历两趟 AST，第一趟生成符号信息，第二趟进行类型检查。如果在某一趟遍历中发现语义错误，直接终止后续操作，输出编译错误；否则，格式化输出作用域和符号表信息。实验框架中统一定义了一些编译错误的类(如 Java 版在 `src/main/java/decaf/driver/error/`)，报错时选择最接近的错误类，对于新特性你可能需要添加新的错误类。
 
@@ -199,7 +199,7 @@
 
 而不同之处在于：
 
-1. 不能对捕获的外层作用域中的符号**直接**赋值，但如果传入的是一个对象或数组的引用，可以通过该引用修改类的成员或数组元素。
+1. 不能对捕获的外层的**非类**作用域中的符号**直接**赋值，但如果传入的是一个对象或数组的引用，可以通过该引用修改类的成员或数组元素。
 2. 如果要将 Lambda 表达式赋值给一个符号，则 Lambda 内部作用域中的变量既不能与该符号重名，也不能访问到该符号。
 
 例子：
@@ -209,7 +209,8 @@
   ```java
   class Main {
       int v;
-      static void main() {
+      static void main() {}
+      void test() {
           var x = new int[10];
           var m = new Main();
           var addx = fun() {
@@ -218,6 +219,7 @@
               var addy = fun() {
                   y = y + 1;          // bad
                   m.v = 1;            // ok
+                  v = 1;              // ok
               };
               y = -1;                 // ok
               m = null;               // bad
@@ -229,9 +231,13 @@
   报错：
 
   ```
-  *** Error at (10,19): cannot assign value to captured variables in lambda expression
-  *** Error at (14,15): cannot assign value to captured variables in lambda expression
+  *** Error at (11,19): cannot assign value to captured variables in lambda expression
+  *** Error at (16,15): cannot assign value to captured variables in lambda expression
   ```
+
+> 为什么要求不能对捕获的外层的非类作用域中的符号直接赋值呢？本质上这是为了减少大家PA3的工作量。非类作用域，也就是局部/参数/(大家可能需要实现的)Lambda作用域，这里的变量都属于局部变量，在运行时它们都存在于栈上。如果需要在Lambda表达式中修改它们，必须要保存对应的内存地址，然而这个Lambda表达式可能在本函数返回之后才被调用，这时这些内存地址就不再有效了。如果一定要实现类似的效果，同时不牺牲安全性为代价的话，可以参考Scala编译器对Lambda表达式中对局部变量赋值的处理，预计工作量不算小，所以我们就直接禁止这样的赋值了。
+>
+> 顺便说一句，部分助教一直觉得区分局部/参数/(大家可能需要实现的)Lambda作用域这样的设计**非常冗余**，本质上它们都对应于局部变量，完全可以统一用局部作用域的概念表示。也许在未来的基础框架中，将不会有参数作用域的概念，这样上面的叙述也会稍微简洁一点。
 
 * 错例 3-3：
 
@@ -282,6 +288,8 @@
 > 此外对于局部变量符号的查找需要特殊处理。对于检查符号知否与已定义的符号重名，在第一趟遍历对 `LocalVarDef` 节点处理时进行，此时作用域中只包含当前位置之前的符号。为了正确实现 Lambda 表达式的符号访问规则，可先在作用域中定义符号，再处理初值(可能是一个 Lambda 表达式)，使得该符号对初值表达式可见。
 >
 > 对于检查该符号是否有定义，在第二趟遍历对 `VarSel` 节点处理时进行，此时作用域中已包含当前作用域的所有符号，查找时除了需要“位置在当前当前位置之前”这个条件 (见 `lookupBefore()` 函数)，如果当前正好位于变量定义语句中，还需要加上“不是当前正在定义的符号”这个条件。如果只是普通的变量定义或 Lambda 表达式没有嵌套，“当前正在定义的符号”只有一个；而如果像上面的例子一样 Lambda 表达式有嵌套，就可能有多个“当前正在定义的符号”，你需要正确维护这些符号，并对 `lookupBefore()` 函数进行一定的修改。
+>
+> Rust版对于上述问题的解决方案也有对应的提示，可以参考Rust版的文档中的[这个部分](https://mashplant.gitbook.io/decaf-doc/pa2/kuang-jia-zhong-bu-fen-shi-xian-de-jie-shi)。
 
 #### Lambda 表达式返回类型
 
@@ -498,8 +506,8 @@ call ::= expr '(' exprList ')'
 1. 打印作用域名(`GlOBAL`、`CLASS`、`FORMAL`、`LOCAL`)
 2. 增加缩进
 3. 打印该作用域直接包含的符号位置、名称与类型。
-3. 遍历所有子作用域，依次递归打印它们
-4. 减少缩进
+4. 遍历所有子作用域，依次递归打印它们
+5. 减少缩进
 
 新增特性的打印格式如下：
 
