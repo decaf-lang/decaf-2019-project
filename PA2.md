@@ -356,7 +356,11 @@
 
 可直接将一个方法名赋值给一个局部变量，此变量就会具有函数类型，可像函数一样调用。
 
-你需要理解并修改框架中对抽象语法树 `VarSel` 节点的处理，原来只能处理类的成员变量，你需要将其扩展为支持类的成员方法。当将方法名赋值给一个变量时，方法名的访权限与调用该方法时的情形相同，例如 `var f = A.print;` 没有访问权限错误当且仅当在同一地点调用 `A.print(...);` 时没有权限错误。下面是几个错误的例子：
+你需要理解并修改框架中对抽象语法树 `VarSel` 节点的处理，原来只能处理类的成员变量，你需要将其扩展为支持类的成员方法。当将方法名赋值给一个变量时，方法名的访权限与调用该方法时的情形相同，例如 `var f = A.print;` 没有访问权限错误当且仅当在同一地点调用 `A.print(...);` 时没有权限错误。此外，你也不能对一个类已有的成员方法进行赋值。
+
+注意对于数组类型的对象，自带一个名为 `length` 的方法，也能赋值给一个变量。
+
+下面是几个例子：
 
 * 错例 3-7：
 
@@ -371,9 +375,13 @@
 
       static void main() {
           var a = new A();
-          var f1 = f;         // bad
-          var f2 = a.sf;
-          var f3 = a.vf;      // bad
+          var f1 = f;             // bad
+          var f2 = a.sf;          // ok
+          var f3 = a.vf;          // bad
+          a.sf = Main.main;       // bad
+
+          int[] arr;
+          var len = arr.length;   // ok
       }
   }
   ```
@@ -383,9 +391,15 @@
   ```
   *** Error at (11,18): can not reference a non-static field 'f' from static method 'main'
   *** Error at (13,20): field 'vf' of 'class A' not accessible here
+  *** Error at (14,14): cannot assign value to class member method 'sf'
+  *** Error at (14,14): incompatible operands: int => int = () => void
   ```
 
   `f1` 是因为在 `class Main` 的 `static` 方法里访问了非 `static` 字段；`f3` 是因为在 `class Main` 里无法访问 `class A` 的私有字段；而 `f2` 赋值成功，具有类型 `int => int`。
+
+  第三个错误是因为尝试给 `class A` 的成员方法 `sf` 赋值；第四个错误是因为 `a.sf` 和 `Main.main` 的类型不匹配。
+
+  而最后的 `len` 赋值成功，类型为 `() => int`，调用它相当于调用 `arr.length()`。
 
 #### 函数调用
 
