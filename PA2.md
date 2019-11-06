@@ -137,7 +137,7 @@ patch -p1 < path/to/your/patches/*.patch
   }
   ```
 
-  对于上述程序，各变量的的类型分别推导为：
+  对于上述程序，各变量的类型分别推导为：
 
   ```
   i : int
@@ -525,7 +525,7 @@ call ::= expr '(' exprList ')'
 
 在 PA2 阶段，我们最终会将你构造出来的作用域和符号表进行格式化打印，并与标准输出比对是否一致。基础框架已实现该功能(如 Java 版在 `src/main/java/decaf/printing/PrettyScope.java`)，对于一个作用域，打印格式都遵循如下流程：
 
-1. 打印作用域名(`GlOBAL`、`CLASS`、`FORMAL`、`LOCAL`)
+1. 打印作用域名(`GLOBAL`、`CLASS`、`FORMAL`、`LOCAL`)
 2. 增加缩进
 3. 打印该作用域直接包含的符号位置、名称与类型。
 4. 遍历所有子作用域，依次递归打印它们
