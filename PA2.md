@@ -65,7 +65,7 @@ patch -p1 < path/to/your/patches/*.patch
   报错：
 
   ```
-  *** Error at (1,5): 'Foo' is not abstract and does not override all abstract methods
+  *** Error at (1,1): 'Foo' is not abstract and does not override all abstract methods
   ```
 
 * 错例 1-2：
@@ -83,7 +83,7 @@ patch -p1 < path/to/your/patches/*.patch
   报错：
 
   ```
-  *** Error at (5,5): 'Baz' is not abstract and does not override all abstract methods
+  *** Error at (5,1): 'Baz' is not abstract and does not override all abstract methods
   ```
 
 > 提示：
@@ -111,7 +111,7 @@ patch -p1 < path/to/your/patches/*.patch
   报错：
 
   ```
-  *** Error at (7,13): cannot instantiate abstract class 'Foo'
+  *** Error at (7,9): cannot instantiate abstract class 'Foo'
   ```
 
 ### 新特性 2：局部类型推导
