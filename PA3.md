@@ -182,22 +182,26 @@ PA3需要精确地知道Lambda表达式捕获了哪些变量，为了获取这�
         <th  colspan="4">赋值操作 </th>
     </tr>
     <tr>
-        <th  colspan="2">Assign </th>
+        <th>Assign </th>
+        <th> </th>
         <th>a = b </th>
         <th>把变量b的值赋给变量a </th>
     </tr>
     <tr>
-        <th  colspan="2">LoadVTbl       </th>
+        <th>LoadVTbl       </th>
+        <th></th>
         <th>x = VTABLE\<C\></th>
         <th>把类C的虚表加载到x中 </th>
     </tr>
     <tr>
-        <th  colspan="2">LoadImm4       </th>
+        <th>LoadImm4       </th>
+        <th></th>
         <th>x = 34 </th>
         <th>加载整数常量到变量x中 </th>
     </tr>
     <tr>
-        <th  colspan="2">LoadStrConst       </th>
+        <th>LoadStrConst       </th>
+        <th></th>
         <th>x = “Hello World” </th>
         <th>加载字符串常量到变量x中</th>
     </tr>
@@ -298,7 +302,8 @@ PA3需要精确地知道Lambda表达式捕获了哪些变量，为了获取这�
         <th  colspan="4">控制流管理  </th>
     </tr>
     <tr>
-        <th colspan="2">Branch</th>
+        <th>Branch</th>
+        <th></th>
         <th>branch _L2 </th>
         <th>无条件跳转到行号_L2所表示的地址</th>
     </tr>
@@ -315,7 +320,8 @@ PA3需要精确地知道Lambda表达式捕获了哪些变量，为了获取这�
         <th>如果c不为0则跳转到_L1所表示地址 </th>
     </tr>
     <tr>
-        <th colspan="2">Return</th>
+        <th>Return</th>
+        <th></th>
         <th>return c</th>
         <th>结束函数并把c的值作为返回值返回 </th>
     </tr>
@@ -323,17 +329,20 @@ PA3需要精确地知道Lambda表达式捕获了哪些变量，为了获取这�
         <th  colspan="4">函数调用相关操作  </th>
     </tr>
     <tr>
-        <th colspan="2">Parm</th>
+        <th>Parm</th>
+        <<th></th>
         <th>parm a  </th>
         <th>变量a作为调用的参数传递</th>
     </tr>
     <tr>
-        <th colspan="2">IndirectCall </th>
+        <th>IndirectCall </th>
+        <th></th>
         <th>x = call a</th>
         <th>取出a中函数地址，并调用，结果放x </th>
     </tr>
     <tr>
-        <th colspan="2">DirectCall </th>
+        <th>DirectCall </th>
+        <th></th>
         <th>x = call Label </th>
         <th>根据函数标签，调用函数，结果放x </th>
     </tr>
@@ -356,12 +365,14 @@ PA3需要精确地知道Lambda表达式捕获了哪些变量，为了获取这�
         <th  colspan="4">其他  </th>
     </tr>
     <tr>
-        <th  colspan="2" >Mark</th>
+        <th>Mark</th>
+        <th></th>
         <th>_L5: </th>
         <th>定义一个行号_L5（全局的） </th>
     </tr>
     <tr>
-        <th  colspan="2" >Memo</th>
+        <th>Memo</th>
+        <th></th>
         <th>memo 'XXX'</th>
         <th>注释：XXX（供模拟器使用） </th>
     </tr>
