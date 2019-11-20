@@ -3,23 +3,7 @@
 ## 任务概述
 
 本阶段，我们将对该输入程序进行翻译，把使用带属性修饰的抽象语法树（decorated AST）来表示的输入程序翻译成适合后期处理的另一种中间表示方式。这种中间表示叫做三地址码（Three Address Code, TAC），是一种比较接近汇编语言的中间表示。
-<div style='display: none'>
-<!-- 
-## 本阶段涉及的类和工具说明
 
-    | 文件 /类                   |  说明                                                             |
-    | --------                  | :----:                                                            |
-    | frontend/tacgen/*         |   根据需要修改                                                     |
-    | frontend/parsing/*        |   你要用PA1-A中修改过的文件覆盖目录下相应的文件                       | 
-    | frontend/scope/*          |   你要用PA2中修改过的文件覆盖目录下相应的文件                         |
-    | frontend/symbol/*         |   你要将PA2中修改过的部分复制过来，根据PA3需要可对其进行修改           |
-    | frontend/tree/*           |   你要将前两个阶段中修改过的部分复制过来，根据PA3需要可对其进行修改     |
-    | frontend/type/*           |   你要用PA2中修改过的文件覆盖目录下相应的文件                         |
-    | frontend/typecheck/*      |   你要用PA2中修改过的文件覆盖目录下相应的文件                         |
-    | lowlevel/tac/FuncVisitor  |   根据需要修改                                                     |
-    | lowlevel/tac/RuntimeError |   根据需要修改                                                     |
--->
-</div>
 ## 实验内容
 
 本次实验将给出 decaf 基本框架，其中已经完成了[《Decaf 语言规范》](https://decaf-lang.gitbook.io/workspace/spec) 中所描述语言特征的词法、语法及语义分析。要求和前几阶段一样，增加新语言特性的实现，对AST进行扫描，完成相应语句和表达式的翻译工作。开始时，你需要将前面阶段的工作复制到本次实验的框架中。建议你首先要充分理解基本框架的代码结构及功能，参考框架中对相似语言特征的处理过程，根据自己对语言的理解完成新增语言特性的TAC代码生成。
