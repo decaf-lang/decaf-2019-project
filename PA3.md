@@ -359,13 +359,13 @@ return _T7
     <tr>
         <th>Binary</th>
         <th>LES</th>
-        <th>c = (a &gt; b) </th>
+        <th>c = (a &lt; b) </th>
         <th>若a小于b则c为1，否则为0 </th>
     </tr>
     <tr>
         <th>Binary</th>
         <th>LEQ</th>
-        <th>c = (a &gt;= b) </th>
+        <th>c = (a &lt;= b) </th>
         <th>若a小于等于b则c为1，否则为0 </th>
     </tr>
     <tr>
