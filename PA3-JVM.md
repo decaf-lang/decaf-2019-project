@@ -1,0 +1,167 @@
+# PA3-JVM
+
+JVM 字节码生成
+
+**注意：本阶段仅 Scala 版必做。**
+
+## 任务概述
+
+本阶段的任务与 PA3 相同，只不过采用的中间表示是 JVM 字节码。
+
+本阶段的测试方法与 PA3 一致：测试脚本会自动调用 `java` 运行你的编译器生成的 JVM class 文件，检查其输出与标准输出是否完全一致。
+与 PA3 所采用的 TAC 相比，JVM 拥有十分丰富的指令集，且具备完善的运行时错误捕获机制。
+PA3 中要求的除零错误无需在实现代码时检查，JVM 运行时将会自动捕获并抛出异常。
+因此，在这一阶段中，你只需完成新特性的代码生成。
+
+## 实验内容
+
+在正式开始实验之前，请先阅读实验指导书关于 JVM 介绍的部分，了解 JVM 最基本的知识。
+如有必要，请查阅 [官方文档](https://docs.oracle.com/javase/specs/jvms/se8/html/)。
+请注意：本次实验生成的字节码的 major version 是 52（即 Java 8），这已经在框架中实现好了，**请勿修改**。
+
+### 新特性 1：抽象类
+
+支持用 `abstract` 关键字定义抽象类，及修饰其中的抽象成员方法。
+
+提示：在生成抽象类对应的 JVM class 文件时，使用修饰符 `ACC_ABSTRACT` 修饰该类以及其中的抽象成员。
+
+### 新特性 2：局部类型推导
+
+支持编译器进行局部变量的类型推导。
+由于类型已经在 PA2 阶段推导完成并标注在语法树上，故变量定义的逻辑与框架中 `LocalVarDef` 完全相同，不需要进行额外处理。
+
+### 新特性 3：First-class Functions
+
+PA3 的文档中给出了一种基于函数“闭包”（由函数指针和捕获变量构成）的机制来实现。
+但是，由于 JVM 不支持直接操作内存，这里给出一种面向对象风格的实现方法。
+
+> 此部分仅供参考，你也可以查阅资料选择其他你认为更好的方法来实现。
+
+在 JVM 中，虽然函数不是一等公民，但是对象总是一等公民。因此，一个简单的想法就是把所有的函数（尤其是 lambda 表达式）都看作一个对象。
+与其他对象不同的是，这类对象都有一个叫做 `apply` 的成员方法，该方法完成对此函数的调用。
+简单起见，不妨让这种函数对象都继承自抽象类 `Lam$`。
+如果一个 lambda 表达式具有捕获变量，那么把这些捕获变量全都作为这个对象的成员就可以了。例如：
+
+```java
+class A {
+    int field;
+
+    int(int) getf(int local) {
+        return fun(int x) {
+            return field + local + x;
+        };
+    }
+
+    int callf() {
+        return getf(10)(20);
+    }
+}
+```
+
+可以翻译为如下等价的 Java 代码：
+
+```java
+public class Lam$1 extends Function<Integer, Integer> {
+    A self; // object of class A
+    int local; // captured
+
+    @Override
+    int apply(int x) {
+        return self.field + local + x;
+    }
+}
+
+public class A {
+    protected int field;
+
+    public Function<Integer, Integer> getf(int local) {
+        Lam$1 funcObj = new Lam$1();
+        funcObj.self = this;
+        funcObj.local = local;
+        return funcObj;
+    }
+
+    public int callf() {
+        return getf(10).apply(20);
+    }
+}
+```
+
+需要特别处理的是，当一个方法名被直接当做函数使用时，如：
+
+```java
+class A {
+    void() getf() { return f; }
+    void f() { Print("A"); }
+}
+
+class B extends A {
+    void f() { Print("B") }
+}
+
+class Main {
+    static void main() {
+        class A b = new B();
+        b.getf()();
+    }
+}
+```
+
+我们需要为该方法（例子中是 `f`）自动生成一次正常调用 `f()` 的包装函数对象，如下面的 Java 代码所示：
+
+```java
+public interface Action$ { void apply(); } // function of type () => void
+
+public class Action$1 extends Action$ {
+    public A self;
+
+    @Override
+    public void apply() {
+        self.f();
+    }
+}
+
+public class A {
+    public Action$ getf() {
+        var funcObj = new Action$1();
+        funcObj.self = this;
+        return funcObj;
+    }
+
+    public void f() { System.out.print("A"); }
+}
+
+public class B extends A {
+    void f() { Print("B") }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A b = new B();
+        b.getf().apply();
+    }
+}
+```
+
+除了上述方法外，JVM 7 还支持了 `INVOKEDYNAMIC` 以更加高效地实现 lambda 调用。
+感兴趣的同学可以参考 [这篇文章](https://www.infoq.com/articles/Java-8-Lambdas-A-Peek-Under-the-Hood/) 进行实现。
+
+## 提示
+
+1. 使用 `javap -v class文件名` 反编译字节码，输出可读的 JVM 指令序列，以检查它是否与预期一致。
+2. 当 JVM 报出你从未见过的错误时，请尝试用搜索引擎查找错误信息，并理解出错的原因，以便后续的调试。
+3. Scala 本身就支持完整的 first-class function，且默认编译到 JVM 字节码。
+因此，你可以将测例翻译为 Scala 代码，然后查看 Scala 编译器生成的字节码，这可以启发你找到具体的实现方法（如果你打算采用 Scala 编译器的方法实现）。
+
+## 实验评分和实验报告
+
+我们提供了若干测试程序和标准输出，你的输出需要与标准输出完全一致才行。我们会有**未公开**的测例。
+但是，这一阶段的全部测例与 PA3 相同（抛弃了有运行时错误的例子），因此你的实现只要达到 PA3 的要求即可。
+对于 PA3 明文规定不考察的那些特性，你无需实现。
+
+实验评分分两部分：
+
+- 评测结果：80%。这部分是机器检查，要求你的输出和标准输出**一模一样**。
+- 实验报告（根目录下 `report-PA3-JVM.pdf` 文件）：20%。要求用中文或英文简要叙述你的工作内容，并回答问题：
+
+请举出**至少两处**本阶段与 PA3 阶段在实现机制上的不同，包括你实现的部分和框架中已经完成的部分。
