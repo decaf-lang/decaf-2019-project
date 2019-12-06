@@ -89,6 +89,27 @@ public class A {
 }
 ```
 
+TODO:
+
+```java
+public class A {
+    int field;
+
+    public Function<Integer, Integer> getf(int local) {
+        return new Function<Integer, Integer>() {
+            @Override
+            public Integer apply(Integer x) {
+                return field + local + x;
+            }
+        };
+    }
+
+    public int callf() {
+        return getf(10).apply(20);
+    }
+}
+```
+
 需要特别处理的是，当一个方法名被直接当做函数使用时，如：
 
 ```java
