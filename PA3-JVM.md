@@ -61,18 +61,20 @@ class A {
 可以翻译为如下等价的 Java 代码：
 
 ```java
-public class Lam$1 extends Function<Integer, Integer> {
+import java.util.function.Function;
+
+public class Lam$1 implements Function<Integer, Integer> {
     A self; // object of class A
     int local; // captured
 
     @Override
-    int apply(int x) {
+    public Integer apply(Integer x) {
         return self.field + local + x;
     }
 }
 
 public class A {
-    protected int field;
+    int field;
 
     public Function<Integer, Integer> getf(int local) {
         Lam$1 funcObj = new Lam$1();
@@ -110,10 +112,10 @@ class Main {
 我们需要为该方法（例子中是 `f`）自动生成一次正常调用 `f()` 的包装函数对象，如下面的 Java 代码所示：
 
 ```java
-public interface Action$ { void apply(); } // function of type () => void
+public interface Action$ { public void apply(); } // function of type () => void
 
-public class Action$1 extends Action$ {
-    public A self;
+public class Action$1 implements Action$ {
+    A self;
 
     @Override
     public void apply() {
@@ -123,16 +125,20 @@ public class Action$1 extends Action$ {
 
 public class A {
     public Action$ getf() {
-        var funcObj = new Action$1();
+        Action$1 funcObj = new Action$1();
         funcObj.self = this;
         return funcObj;
     }
 
-    public void f() { System.out.print("A"); }
+    public void f() {
+        System.out.print("A");
+    }
 }
 
 public class B extends A {
-    void f() { Print("B") }
+    public void f() {
+        System.out.print("B");
+    }
 }
 
 public class Main {
