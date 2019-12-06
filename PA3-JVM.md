@@ -10,8 +10,8 @@ JVM 字节码生成
 
 本阶段的测试方法与 PA3 一致：测试脚本会自动调用 `java` 运行你的编译器生成的 JVM class 文件，检查其输出与标准输出是否完全一致。
 与 PA3 所采用的 TAC 相比，JVM 拥有十分丰富的指令集，且具备完善的运行时错误捕获机制。
-PA3 中要求的除零错误无需在实现代码时检查，JVM 运行时将会自动捕获并抛出异常。
-因此，在这一阶段中，你只需完成新特性的代码生成。
+PA3 中要求的除零错误无需你来实现，JVM 的运行时能自动捕获并抛出异常。
+因此，在这一阶段中，你的主要任务是~~学习 JVM ~~完成新特性的代码生成。
 
 ## 实验内容
 
@@ -39,7 +39,6 @@ PA3 的文档中给出了一种基于函数“闭包”（由函数指针和捕�
 
 在 JVM 中，虽然函数不是一等公民，但是对象总是一等公民。因此，一个简单的想法就是把所有的函数（尤其是 lambda 表达式）都看作一个对象。
 与其他对象不同的是，这类对象都有一个叫做 `apply` 的成员方法，该方法完成对此函数的调用。
-简单起见，不妨让这种函数对象都继承自抽象类 `Lam$`。
 如果一个 lambda 表达式具有捕获变量，那么把这些捕获变量全都作为这个对象的成员就可以了。例如：
 
 ```java
@@ -64,8 +63,8 @@ class A {
 import java.util.function.Function;
 
 public class Lam$1 implements Function<Integer, Integer> {
-    A self; // object of class A
-    int local; // captured
+    A self; // captured: object of class A
+    int local; // captured local variable
 
     @Override
     public Integer apply(Integer x) {
@@ -89,7 +88,19 @@ public class A {
 }
 ```
 
-TODO:
+可以看出，我们为 `fun(int x) { return field + local + x; }` 这个 lambda 表达式专门生成 (synthesize) 了一个新的类 `Lam$1`，并且把 lambda 表达式的函数体实现在 `apply` 方法里面。
+这个类继承了 Java 的函数对象接口 `Function<T, R>`，它表示一个输入 `T` 返回 `R` 的函数对象。
+特别地，捕获变量 `self` 和 `local` 都成为该类的成员。
+而在 `getf` 方法中，我们要做的事情就是，new 出来这个 `Lam$1` 的实例（对象），初始化其中的捕获变量成员，然后返回该实例 `funcObj`。
+最后，在 `callf` 方法中，我们通过调用函数对象的 `apply` 方法来迂回地实现对 lambda 表达式的调用。
+
+上述翻译策略总结如下：
+
+1. 为每个 lambda 表达式生成一个类，继承合适的函数对象接口，在类中声明其捕获变量作为成员变量，并在 `apply` 方法中真正地实现该 lambda 表达式的函数体；
+2. 在每个 lambda 表达式的定义处，new 一个它对应的类（第1步生成的那个）的实例，注意初始化其中的捕获变量；
+3. 在每个 lambda 表达式的调用处，调用那个实例（第2步生成的那个）的 `apply` 方法，正常传入用户给的参数。
+
+插入一段题外话：熟悉匿名类的同学会发现，上面这一段 Java 代码可以简写为：
 
 ```java
 public class A {
@@ -110,7 +121,11 @@ public class A {
 }
 ```
 
-需要特别处理的是，当一个方法名被直接当做函数使用时，如：
+但是，这样的实现并不能简化 JVM 字节码生成的过程。
+如果你把上述代码交给 Java 编译器 `javac` 处理，你会发现它除了生成 `A.class` 外，还会生成 `A$1.class`。
+这个 `A$1.class` 的功能与 `Lam$1` 是一样的。
+
+另外一种需要考虑的情况是，方法名直接当做函数使用。如：
 
 ```java
 class A {
@@ -130,7 +145,7 @@ class Main {
 }
 ```
 
-我们需要为该方法（例子中是 `f`）自动生成一次正常调用 `f()` 的包装函数对象，如下面的 Java 代码所示：
+我们需要为该方法（例子中是 `f`）自动生成一个函数对象，它的 `apply` 方法很简单——调用那个方法（`f`）。如下面的 Java 代码所示：
 
 ```java
 public interface Action$ { public void apply(); } // function of type () => void
@@ -170,6 +185,8 @@ public class Main {
 }
 ```
 
+这里的 `Action$1` 类的对象 `funcObj` 就是对 `f` 方法的一层包装，它的 `apply` 方法体就是单纯地调用一下 `f` 而已。
+
 除了上述方法外，JVM 7 还支持了 `INVOKEDYNAMIC` 以更加高效地实现 lambda 调用。
 感兴趣的同学可以参考 [这篇文章](https://www.infoq.com/articles/Java-8-Lambdas-A-Peek-Under-the-Hood/) 进行实现。
 
@@ -177,8 +194,8 @@ public class Main {
 
 1. 使用 `javap -v class文件名` 反编译字节码，输出可读的 JVM 指令序列，以检查它是否与预期一致。
 2. 当 JVM 报出你从未见过的错误时，请尝试用搜索引擎查找错误信息，并理解出错的原因，以便后续的调试。
-3. Scala 本身就支持完整的 first-class function，且默认编译到 JVM 字节码。
-因此，你可以将测例翻译为 Scala 代码，然后查看 Scala 编译器生成的字节码，这可以启发你找到具体的实现方法（如果你打算采用 Scala 编译器的方法实现）。
+3. [JVM 文档](https://docs.oracle.com/javase/specs/jvms/se8/html/) 和 [Java Function Interface 文档](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html) 是你的好朋友。
+4. 学习 Scala 编译器的实现：你可以将测例翻译成 Scala 代码，然后查看 Scala 编译器生成的字节码，这可以启发你找到科学的实现方案（如果你打算采用 Scala 编译器的那一套的话）。
 
 ## 实验评分和实验报告
 
