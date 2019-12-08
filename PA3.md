@@ -114,7 +114,7 @@ class A {
 }
 
 class B extends A {
-    void f() { Print("B") }
+    void f() { Print("B"); }
 }
 
 class Main {
