@@ -15,9 +15,9 @@ PA3 中要求的除零错误无需你来实现，JVM 的运行时能自动捕获
 
 ## 实验内容
 
-在正式开始实验之前，请先阅读实验指导书关于 JVM 介绍的部分，了解 JVM 最基本的知识。
+在正式开始实验之前，请先阅读实验指导书关于 [JVM 字节吗简介](https://decaf-lang.gitbook.io/decaf-book/scala-kuang-jia-fen-jie-duan-zhi-dao/pa3jvmjvm-zi-jie-ma-sheng-cheng/jvm) 的部分，了解 JVM 最基本的知识。
 如有必要，请查阅 [官方文档](https://docs.oracle.com/javase/specs/jvms/se8/html/)。
-请注意：本次实验生成的字节码的 major version 是 52（即 Java 8），这已经在框架中实现好了，**请勿修改**。
+请注意：本次实验生成的字节码的 major version 是 52（即 Java 8），这已经在框架中实现好了，**请勿修改！**
 
 ### 新特性 1：抽象类
 
@@ -89,14 +89,14 @@ public class A {
 ```
 
 可以看出，我们为 `fun(int x) { return field + local + x; }` 这个 lambda 表达式专门生成 (synthesize) 了一个新的类 `Lam$1`，并且把 lambda 表达式的函数体实现在 `apply` 方法里面。
-这个类继承了 Java 的函数对象接口 `Function<T, R>`，它表示一个输入 `T` 返回 `R` 的函数对象。
+这个类继承了 Java 的“函数式”接口 (Functional Interface) `Function<T, R>`，它表示一个输入 `T` 返回 `R` 的函数对象。
 特别地，捕获变量 `self` 和 `local` 都成为该类的成员。
 而在 `getf` 方法中，我们要做的事情就是，new 出来这个 `Lam$1` 的实例（对象），初始化其中的捕获变量成员，然后返回该实例 `funcObj`。
 最后，在 `callf` 方法中，我们通过调用函数对象的 `apply` 方法来迂回地实现对 lambda 表达式的调用。
 
 上述翻译策略总结如下：
 
-1. 为每个 lambda 表达式生成一个类，继承合适的函数对象接口，在类中声明其捕获变量作为成员变量，并在 `apply` 方法中真正地实现该 lambda 表达式的函数体；
+1. 为每个 lambda 表达式生成一个类，继承合适的 Functional Interface，在类中声明其捕获变量作为成员变量，并在 `apply` 方法中真正地实现该 lambda 表达式的函数体；
 2. 在每个 lambda 表达式的定义处，new 一个它对应的类（第1步生成的那个）的实例，注意初始化其中的捕获变量；
 3. 在每个 lambda 表达式的调用处，调用那个实例（第2步生成的那个）的 `apply` 方法，正常传入用户给的参数。
 
@@ -121,7 +121,7 @@ public class A {
 }
 ```
 
-但是，这样的实现并不能简化 JVM 字节码生成的过程。
+但是，这样的实现并不能简化 JVM 字节码生成的过程！
 如果你把上述代码交给 Java 编译器 `javac` 处理，你会发现它除了生成 `A.class` 外，还会生成 `A$1.class`。
 这个 `A$1.class` 的功能与 `Lam$1` 是一样的。
 
@@ -145,7 +145,7 @@ class Main {
 }
 ```
 
-我们需要为该方法（例子中是 `f`）自动生成一个函数对象，它的 `apply` 方法很简单——调用那个方法（`f`）。如下面的 Java 代码所示：
+我们需要为该方法（例子中是 `f`）自动生成一个函数对象，它的 `apply` 方法很简单——真正调用那个方法（`f`）。如下面的 Java 代码所示：
 
 ```java
 public interface Action$ { public void apply(); } // function of type () => void
@@ -187,26 +187,32 @@ public class Main {
 
 这里的 `Action$1` 类的对象 `funcObj` 就是对 `f` 方法的一层包装，它的 `apply` 方法体就是单纯地调用一下 `f` 而已。
 
-除了上述方法外，JVM 7 还支持了 `INVOKEDYNAMIC` 以更加高效地实现 lambda 调用。
+除了上述方法外，JVM 从 7 开始（我们用的8）支持 `INVOKEDYNAMIC` 以更加高效地实现 lambda 调用。
 感兴趣的同学可以参考 [这篇文章](https://www.infoq.com/articles/Java-8-Lambdas-A-Peek-Under-the-Hood/) 进行实现。
 
 ## 提示
 
 1. 使用 `javap -v class文件名` 反编译字节码，输出可读的 JVM 指令序列，以检查它是否与预期一致。
 2. 当 JVM 报出你从未见过的错误时，请尝试用搜索引擎查找错误信息，并理解出错的原因，以便后续的调试。
-3. [JVM 文档](https://docs.oracle.com/javase/specs/jvms/se8/html/) 和 [Java Function Interface 文档](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html) 是你的好朋友。
+3. [JVM 文档](https://docs.oracle.com/javase/specs/jvms/se8/html/) 和 [Java Functional Interface 文档](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html) 是你的好朋友。
 4. 学习 Scala 编译器的实现：你可以将测例翻译成 Scala 代码，然后查看 Scala 编译器生成的字节码，这可以启发你找到科学的实现方案（如果你打算采用 Scala 编译器的那一套的话）。
+
+## 公开测例
+
+本阶段的公开测例与 PA3 相同，即 [S3/](https://github.com/decaf-lang/decaf-2019-TestCases/tree/master/S3) 下的测例。
+由于这一阶段不考查对运行时错误的处理，请手工忽略 `test_divisionbyzero1.decaf` 和 `test_divisionbyzero2.decaf` 这两个例子。
+隐藏测试集里面的**所有**测例都**不会有**运行时错误。
 
 ## 实验评分和实验报告
 
 我们提供了若干测试程序和标准输出，你的输出需要与标准输出完全一致才行。我们会有**未公开**的测例。
-但是，这一阶段的全部测例与 PA3 相同（抛弃了有运行时错误的例子），因此你的实现只要达到 PA3 的要求即可。
-对于 PA3 明文规定不考察的那些特性，你无需实现。
+但是，这一阶段的全部测例与 PA3 相同（刨开有运行时错误的例子），因此你的实现只要达到 PA3 的要求即可——
+对于 PA3 明文规定不考察的那些特性，你**无需**实现。
 
 实验评分分两部分：
 
 - 评测结果：80%。这部分是机器检查，要求你的输出和标准输出**一模一样**。
-- 实验报告（根目录下 `report-PA3-JVM.pdf` 文件）：20%。要求用中文或英文简要叙述你的工作内容，并回答以下两个问题：
+- 实验报告（根目录下 `report-PA3-JVM.pdf` 文件）：20%。要求用中文或英文简要叙述你的工作内容，**并回答**以下两个问题：
 
 Q1. 请举出**至少两处**本阶段与 PA3 阶段在实现机制上的不同，包括你实现的部分和框架中已经完成的部分。
 
