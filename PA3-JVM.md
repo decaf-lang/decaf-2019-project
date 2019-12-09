@@ -11,11 +11,11 @@ JVM 字节码生成
 本阶段的测试方法与 PA3 一致：测试脚本会自动调用 `java` 运行你的编译器生成的 JVM class 文件，检查其输出与标准输出是否完全一致。
 与 PA3 所采用的 TAC 相比，JVM 拥有十分丰富的指令集，且具备完善的运行时错误捕获机制。
 PA3 中要求的除零错误无需你来实现，JVM 的运行时能自动捕获并抛出异常。
-因此，在这一阶段中，你的主要任务是~~学习 JVM ~~完成新特性的代码生成。
+因此，在这一阶段中，你的主要任务是<del>学习 JVM</del>完成新特性的代码生成。
 
 ## 实验内容
 
-在正式开始实验之前，请先阅读实验指导书关于 [JVM 字节吗简介](https://decaf-lang.gitbook.io/decaf-book/scala-kuang-jia-fen-jie-duan-zhi-dao/pa3jvmjvm-zi-jie-ma-sheng-cheng/jvm) 的部分，了解 JVM 最基本的知识。
+在正式开始实验之前，请先阅读实验指导书关于 [JVM 字节码简介](https://decaf-lang.gitbook.io/decaf-book/scala-kuang-jia-fen-jie-duan-zhi-dao/pa3jvmjvm-zi-jie-ma-sheng-cheng/jvm) 的部分，了解 JVM 最基本的知识。
 如有必要，请查阅 [官方文档](https://docs.oracle.com/javase/specs/jvms/se8/html/index.html)。
 请注意：本次实验生成的字节码的 major version 是 52（即 Java 8），这已经在框架中实现好了，**请勿修改！**
 
@@ -194,7 +194,7 @@ public class Main {
 
 1. 使用 `javap -v class文件名` 反编译字节码，输出可读的 JVM 指令序列，以检查它是否与预期一致。
 2. 当 JVM 报出你从未见过的错误时，请尝试用搜索引擎查找错误信息，并理解出错的原因，以便后续的调试。
-3. [JVM 文档](https://docs.oracle.com/javase/specs/jvms/se8/html/) 和 [Java Functional Interface 文档](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html) 是你的好朋友。
+3. [JVM 文档](https://docs.oracle.com/javase/specs/jvms/se8/html/) 和 [Java Functional Interface 文档](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html) 是你的好朋友。由于 Java Functional Interface 似乎不支持3个参数以上的函数，你可以考虑像 Scala 那样搞一堆 `Function3, Function4, ...` 以适应不同参数个数的函数。
 4. 学习 Scala 编译器的实现：你可以将测例翻译成 Scala 代码，然后查看 Scala 编译器生成的字节码，这可以启发你找到科学的实现方案（如果你打算采用 Scala 编译器的那一套的话）。
 
 ## 公开测例
