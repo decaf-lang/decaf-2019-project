@@ -16,7 +16,7 @@ PA3 中要求的除零错误无需你来实现，JVM 的运行时能自动捕获
 ## 实验内容
 
 在正式开始实验之前，请先阅读实验指导书关于 [JVM 字节吗简介](https://decaf-lang.gitbook.io/decaf-book/scala-kuang-jia-fen-jie-duan-zhi-dao/pa3jvmjvm-zi-jie-ma-sheng-cheng/jvm) 的部分，了解 JVM 最基本的知识。
-如有必要，请查阅 [官方文档](https://docs.oracle.com/javase/specs/jvms/se8/html/)。
+如有必要，请查阅 [官方文档](https://docs.oracle.com/javase/specs/jvms/se8/html/index.html)。
 请注意：本次实验生成的字节码的 major version 是 52（即 Java 8），这已经在框架中实现好了，**请勿修改！**
 
 ### 新特性 1：抽象类
