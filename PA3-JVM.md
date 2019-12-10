@@ -200,7 +200,7 @@ public class Main {
 ## 公开测例
 
 本阶段的公开测例与 PA3 相同，即 [S3/](https://github.com/decaf-lang/decaf-2019-TestCases/tree/master/S3) 下的测例。
-由于这一阶段不考查对运行时错误的处理，请手工忽略 `test_divisionbyzero1.decaf` 和 `test_divisionbyzero2.decaf` 这两个例子。
+由于这一阶段不考查对运行时错误的处理，测试脚本已忽略 `test_divisionbyzero1.decaf` 和 `test_divisionbyzero2.decaf` 这两个例子。
 隐藏测试集里面的**所有**测例都**不会有**运行时错误。
 
 ## 实验评分和实验报告
