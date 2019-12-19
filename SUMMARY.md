@@ -7,5 +7,6 @@
 * [PA3 实验说明](PA3.md)
 * [PA3-JVM 实验说明](PA3-JVM.md)
 * [PA4 实验说明](PA4.md)
+* [PA5 实验说明](PA5.md)
 * [新特性提案](new-features.md)
 * [FAQ](faq.md)
