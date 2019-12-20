@@ -188,7 +188,7 @@ public class Main {
 这里的 `Action$1` 类的对象 `funcObj` 就是对 `f` 方法的一层包装，它的 `apply` 方法体就是单纯地调用一下 `f` 而已。
 
 除了上述方法外，JVM 从 7 开始（我们用的8）支持 `INVOKEDYNAMIC` 以更加高效地实现 lambda 调用。
-感兴趣的同学可以参考 [这篇文章](https://www.infoq.com/articles/Java-8-Lambdas-A-Peek-Under-the-Hood/) 进行实现。
+感兴趣的同学可以参考 [这个](https://www.infoq.com/articles/Java-8-Lambdas-A-Peek-Under-the-Hood/) 以及 [这个（更加详细）](https://cr.openjdk.java.net/~briangoetz/lambda/lambda-translation.html) 进行实现。
 
 ## 提示
 
